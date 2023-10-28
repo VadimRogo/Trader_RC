@@ -3,10 +3,8 @@ from binance.client import Client
 import re
 import time
 import json
-from alive_progress import alive_bar
 from datetime import datetime
 import matplotlib.pyplot as plt
-from tqdm import tqdm
 api_key = 'z7Ltgm7gB1OBsvRiSPCuYOIq7CHMXEVT1ch4vnGuuxZ4I9kaKc7gwLbmd6n3HBJ2'
 api_secret = '3h3ylP3VtH6Rtvm83aoHrcI8erMjZfNeX6MAgRGnSHL1srkvu2WcJlUnH1fq59LX'
 
