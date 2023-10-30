@@ -176,14 +176,14 @@ def checkTicketsToSell(tickets, price, symbol):
                 sell(ticket)
                 ticket['status'] = 'loss'
 
-for i in range(250):
+for i in range(1250):
     for coinInfo in coinInfos:
         appendPrices(coinInfo)
         balance = float(client.get_asset_balance(asset='USDT')['free'])
         if len(coinInfo['prices']) > 5:
             checkIndicators(coinInfo)
             checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'][-1])
-        time.sleep(5)
+        time.sleep(60)
         
 for ticket in tickets:
     sell(ticket)
