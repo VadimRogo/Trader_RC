@@ -12,7 +12,7 @@ client = Client(api_key, api_secret)
 
 tickers = client.get_all_tickers()
 tickers = pd.DataFrame(tickers)
-whitelist = ['ETHUSDT', 'SOLUSDT', 'DOGEUSDT', 'LTCUSDT', 'SHIBUSDT', 'PLAUSDT', 'ONTUSDT', 'FARMUSDT', 'HARDUSDT', 'CHESSUSDT']
+whitelist = ['WLDUSDT', 'MBLUSDT', 'ZILUSDT', 'HIGHUSDT', 'ETCUSDT', 'ETHUSDT', 'SOLUSDT', 'DOGEUSDT', 'LTCUSDT', 'SHIBUSDT', 'PLAUSDT', 'ONTUSDT', 'FARMUSDT', 'HARDUSDT', 'CHESSUSDT']
 balances, tickets, info = [], [], []
 balance = float(client.get_asset_balance(asset='USDT')['free'])
 partOfBalance = 10
@@ -24,6 +24,34 @@ def get_precision(symbol):
    for x in info['symbols']:
     if x['symbol'] == symbol:
         return x['quantityPrecision']
+def CCIs(coinInfo):
+    typicalPrice = coinInfo['prices'][-1]
+    MA = sum(coinInfo['prices'][:-15:-1]) / len(coinInfo['prices'][:-15:-1])
+    coinInfo['mas'].append(MA)
+    if len(coinInfo['mas']) > 15:
+        meanDeviation = abs(sum(coinInfo['prices'][:-15:-1]) - sum(coinInfo['MAs'][:-15:-1])) / 15
+        CCI = (typicalPrice - MA) / (0.015 * meanDeviation)
+        coinInfo['ccis'].append(CCI)
+        if coinInfo['ccis'][-1] < -100:
+            coinInfo['buySignal'][4] = True
+        elif coinInfo['ccis'][-1] > 100:
+            coinInfo['buySignal'][4] = False
+
+def Fibo(coinInfo):
+    maximum = max(coinInfo['prices'][:-30:-1])
+    fibo = [0.786 * maximum, 0.618 * maximum, 0.382 * maximum, 0.236 * maximum]
+    percents = 0.02
+    lastPrice = coinInfo['price']
+    if lastPrice < fibo[0] + fibo[0] * percents and lastPrice > fibo[0] - fibo[0] * percents:
+        coinInfo['buySignal'][3] = True
+    if lastPrice < fibo[1] + fibo[1] * percents and lastPrice > fibo[1] - fibo[1] * percents:
+        coinInfo['buySignal'][3] = True
+    if lastPrice < fibo[2] + fibo[2] * percents and lastPrice > fibo[2] - fibo[2] * percents:
+        coinInfo['buySignal'][3] = True
+    if lastPrice < fibo[3] + fibo[3] * percents and lastPrice > fibo[3] - fibo[3] * percents:
+        coinInfo['buySignal'][3] = True
+    
+
 def Rsis(coinInfo):
     diff = coinInfo['prices'][-2] - coinInfo['prices'][-1]
     if len(coinInfo['prices']) > 2 and diff > 0:
@@ -35,7 +63,11 @@ def Rsis(coinInfo):
         RS = coinInfo['avg_gain'] / coinInfo['avg_loss']
         RSI = 100 - (100 / (1 + RS))
         coinInfo['rsis'].append(RSI)
-        coinInfo['buySignal'][0] = True
+        if RSI < 30 and RSI > 20:
+            coinInfo['buySignal'][0] = True
+        elif RSI > 70 and RSI < 90:
+            coinInfo['buySignal'][0] = False
+    
     
 def Mcds(CoinInfo):
     long_EMA = sum(CoinInfo['prices'][:-26:-1]) / len(CoinInfo['prices'][:-26:-1])
@@ -49,7 +81,10 @@ def Mcds(CoinInfo):
     CoinInfo['macds'].append(MACD)
     if len(CoinInfo['macds']) > 10 and MACD - signal > -0.6 and MACD - signal < 0.6:
         CoinInfo['buySignal'][1] = True
+    elif len(CoinInfo['macds']) > 10 and MACD - signal > 0.6 and MACD - signal < -0.6:
+        CoinInfo['buySignal'][1] = False
         
+    
 def Stochastic(CoinInfo):
     priceLock = CoinInfo['prices'][-1]
     minimum = min(CoinInfo['prices'][:15])
@@ -59,6 +94,8 @@ def Stochastic(CoinInfo):
         CoinInfo['stoch'].append(Stoch)
         if len(CoinInfo['stoch']) > 10 and Stoch < 20:
             CoinInfo['buySignal'][2] = True
+        elif Stoch > 70:
+            CoinInfo['buySignal'][2] = False
 def buy(coinInfo):
     try:
         balance = float(client.get_asset_balance(asset='USDT')['free'])
@@ -133,7 +170,10 @@ def makeCoinsJson(symbol):
         'short_EMA' : [],
         'short_diff_EMA' : [],
         'stoch' : [],
-        'buySignal' : [False, False, False],
+        'max' : 1,
+        'mas' : [],
+        'ccis' : [],
+        'buySignal' : [False, False, False, False, False],
         'precision' : precision
     }
     coinInfos.append(coinInfo)
@@ -143,15 +183,18 @@ def checkIndicators(coinInfo):
         Rsis(coinInfo)
     if len(coinInfo['prices']) > 15:
         Mcds(coinInfo)
-    if len(coinInfo['prices']) > 15:
+        Fibo(coinInfo)
         Stochastic(coinInfo)
+        CCIs(coinInfo)
+        
+    
     for i in coinInfo['buySignal']:
         if i == True:
             signalCounter += 1
         if signalCounter >= 2:
             buy(coinInfo)
             signalCounter = 0
-            coinInfo['buySignal'] = [False, False, False]            
+            coinInfo['buySignal'] = [False, False, False, False]            
 def makeStatistic(tickets):
     counterLoss = 1
     counterGain = 1
