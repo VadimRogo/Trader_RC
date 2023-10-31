@@ -15,7 +15,7 @@ tickers = pd.DataFrame(tickers)
 whitelist = ['WLDUSDT', 'MBLUSDT', 'ZILUSDT', 'HIGHUSDT', 'ETCUSDT', 'ETHUSDT', 'SOLUSDT', 'DOGEUSDT', 'LTCUSDT', 'SHIBUSDT', 'PLAUSDT', 'ONTUSDT', 'FARMUSDT', 'HARDUSDT', 'CHESSUSDT']
 balances, tickets, info = [], [], []
 balance = float(client.get_asset_balance(asset='USDT')['free'])
-partOfBalance = 10
+partOfBalance = 11
 signalCounter = 0
 info = client.futures_exchange_info()
 coinInfos = []
@@ -219,7 +219,7 @@ def checkTicketsToSell(tickets, price, symbol):
                 sell(ticket)
                 ticket['status'] = 'loss'
 
-for i in range(250):
+for i in range(2500):
     print('cycle ', i)
     for coinInfo in coinInfos:
         appendPrices(coinInfo)
