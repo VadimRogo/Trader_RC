@@ -85,7 +85,7 @@ def Rsis(coinInfo):
     print(type(len(coinInfo['prices'])))
     if (len(coinInfo['prices']) > 2) and coinInfo['prices'][-2] - coinInfo['prices'][-1] > 0:
         coinInfo['avg_gain'] += difference
-    elif (len(coinInfo['prices']) > 2) and coinInfo['prices'][-2] - coinInfo['prices'][-1] < 0):
+    elif (len(coinInfo['prices']) > 2) and coinInfo['prices'][-2] - coinInfo['prices'][-1] < 0:
         difference = abs(difference)
         coinInfo['avg_loss'] += difference
     
