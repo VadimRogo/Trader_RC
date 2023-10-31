@@ -176,8 +176,9 @@ def sell(coinInfo, ticket):
     except Exception as E:
         print(E)
 def appendPrices(coinInfo):
-    coinInfo['mins'].append(min(coinInfo['prices'][:-10:-1]))
-    coinInfo['maxs'].append(max(coinInfo['prices'][:-10:-1]))
+    if len(coinInfo['prices']) > 11:
+        coinInfo['mins'].append(min(coinInfo['prices'][:-10:-1]))
+        coinInfo['maxs'].append(max(coinInfo['prices'][:-10:-1]))
     coin = coinInfo['symbol']
     price = float(tickers.loc[tickers['symbol'] == f'{coin}']['price'])
     coinInfo['prices'].append(price)
