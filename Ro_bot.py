@@ -87,7 +87,7 @@ def Rsis(coinInfo):
         difference = abs(difference)
         coinInfo['avg_loss'] += difference
     
-    if counterRsi > 50:
+    if counterRsi > 25:
         coinInfo['avg_gain'] = 1
         coinInfo['avg_loss'] = 1
 
@@ -269,7 +269,7 @@ for i in range(1440):
         if len(coinInfo['prices']) > 5:
             checkIndicators(coinInfo)
             checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'][-1])
-    time.sleep(10)
+    time.sleep(60)
         
 for ticket in tickets:
     sell(ticket)
