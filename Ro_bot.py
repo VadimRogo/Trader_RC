@@ -254,7 +254,7 @@ def checkTicketsToSell(tickets, price, symbol):
                 sell(ticket)
                 ticket['status'] = 'loss'
 
-for i in range(2500):
+for i in range(1440):
     print('cycle ', i)
     for coinInfo in coinInfos:
         appendPrices(coinInfo)
