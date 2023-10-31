@@ -77,13 +77,18 @@ def Fibo(coinInfo):
     
 
 def Rsis(coinInfo):
-    diff = coinInfo['prices'][-2] - coinInfo['prices'][-1]
+    diff = abs(coinInfo['prices'][-2] - coinInfo['prices'][-1])
+    counterRsi += 1
     if len(coinInfo['prices']) > 2 and diff > 0:
         coinInfo['avg_gain'] += diff
-    elif len(coinInfo['prices']) > 2 and diff < 0:
-        diff *= -1
+    elif len(coinInfo['prices']) > 2 and diff > 0:
         coinInfo['avg_loss'] += diff
-    if coinInfo['avg_loss'] > 0:
+
+    if counterRsi > 50:
+        coinInfo['avg_gain'] = 1
+        coinInfo['avg_loss'] = 1
+
+    if coinInfo['avg_loss'] > 0 and coinInfo['avg_gain'] > 1:
         RS = coinInfo['avg_gain'] / coinInfo['avg_loss']
         RSI = 100 - (100 / (1 + RS))
         coinInfo['rsis'].append(RSI)
@@ -263,7 +268,7 @@ for i in range(1440):
         if len(coinInfo['prices']) > 5:
             checkIndicators(coinInfo)
             checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'][-1])
-    time.sleep(60)
+    time.sleep(10)
         
 for ticket in tickets:
     sell(ticket)
