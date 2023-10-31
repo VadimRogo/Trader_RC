@@ -40,12 +40,13 @@ def CCIs(coinInfo):
     coinInfo['mas'].append(MA)
     if len(coinInfo['mas']) > 15:
         meanDeviation = abs(sum(coinInfo['prices'][:-15:-1]) - sum(coinInfo['mas'][:-15:-1])) / 15
-        CCI = (typicalPrice - MA) / (0.015 * meanDeviation)
-        coinInfo['ccis'].append(CCI)
-        if coinInfo['ccis'][-1] < -100:
-            coinInfo['buySignal'][4] = True
-        elif coinInfo['ccis'][-1] > 100:
-            coinInfo['buySignal'][4] = False
+        if meanDeviation != 0:
+            CCI = (typicalPrice - MA) / (0.015 * meanDeviation)
+            coinInfo['ccis'].append(CCI)
+            if coinInfo['ccis'][-1] < -100:
+                coinInfo['buySignal'][4] = True
+            elif coinInfo['ccis'][-1] > 100:
+                coinInfo['buySignal'][4] = False
 
 def Fibo(coinInfo):
     maximum = max(coinInfo['prices'][:-30:-1])
