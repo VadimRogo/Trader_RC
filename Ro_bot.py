@@ -12,7 +12,7 @@ client = Client(api_key, api_secret)
 
 tickers = client.get_all_tickers()
 tickers = pd.DataFrame(tickers)
-whitelist = ['AMBUSDT', 'PNTUSDT', 'LSKUSDT', 'OMGUSDT', 'ATAUSDT','OCTUSDT', 'ICXUSDT', 'STMXUSDT', 'ARKUSDT', 'WLDUSDT', 'MBLUSDT', 'ZILUSDT', 'HIGHUSDT', 'ETCUSDT', 'ETHUSDT', 'SOLUSDT', 'DOGEUSDT', 'LTCUSDT', 'SHIBUSDT', 'PLAUSDT', 'ONTUSDT', 'FARMUSDT', 'HARDUSDT', 'CHESSUSDT']
+whitelist = ['YFIUSDT', 'PAXGUSDT', 'WBETHUSDT', 'ETHUSDT', 'MKRUSDT', 'BIFIUSDT', 'BCHUSDT', 'SOLUSDT', 'DASHUSDT', 'ZECUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'MANAUSDT', 'SHIBUSDT']
 balances, tickets, info = [], [], []
 balance = float(client.get_asset_balance(asset='USDT')['free'])
 partOfBalance = 11
@@ -80,8 +80,6 @@ def Fibo(coinInfo):
 def Rsis(coinInfo):
     global counterRsi
     counterRsi += 1
-    print(coinInfo['prices'][-2])
-    print(type(coinInfo['prices'][-2]))
     difference = coinInfo['prices'][-2] - coinInfo['prices'][-1]
     if (len(coinInfo['prices']) > 2) and difference > 0:
         coinInfo['avg_gain'] += difference
@@ -271,7 +269,7 @@ for i in range(1440):
         if len(coinInfo['prices']) > 5:
             checkIndicators(coinInfo)
             checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'][-1])
-    time.sleep(1)
+    time.sleep(10)
         
 for ticket in tickets:
     sell(ticket)
