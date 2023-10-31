@@ -78,6 +78,7 @@ def Fibo(coinInfo):
     
 
 def Rsis(coinInfo):
+    global counterRsi
     diff = abs(coinInfo['prices'][-2] - coinInfo['prices'][-1])
     counterRsi += 1
     if len(coinInfo['prices']) > 2 and diff != 0:
