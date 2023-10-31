@@ -180,7 +180,7 @@ def appendPrices(coinInfo):
         coinInfo['mins'].append(min(coinInfo['prices'][:-10:-1]))
         coinInfo['maxs'].append(max(coinInfo['prices'][:-10:-1]))
     coin = coinInfo['symbol']
-    price = float(tickers.loc[tickers['symbol'] == f'{coin}']['price'])
+    price = tickers.loc[tickers['symbol'] == f'{coin}']['price'].astype(float)
     coinInfo['prices'].append(price)
 def makeCoinsJson(symbol):
     precision = get_precision(symbol)
