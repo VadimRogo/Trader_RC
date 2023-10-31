@@ -80,7 +80,9 @@ def Fibo(coinInfo):
 def Rsis(coinInfo):
     global counterRsi
     counterRsi += 1
-    difference = coinInfo['prices'][-2] - coinInfo['prices'][-1]
+    difference = 0
+    print(coinInfo['prices'][-1])
+    print(type(coinInfo['prices'][-2]))
     if (len(coinInfo['prices']) > 2) and difference > 0:
         coinInfo['avg_gain'] += difference
     elif (len(coinInfo['prices']) > 2) and difference < 0:
