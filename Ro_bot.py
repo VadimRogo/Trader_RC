@@ -12,7 +12,7 @@ client = Client(api_key, api_secret)
 
 tickers = client.get_all_tickers()
 tickers = pd.DataFrame(tickers)
-whitelist = ['ICXUSDT', 'STMXUSDT', 'ARKUSDT', 'WLDUSDT', 'MBLUSDT', 'ZILUSDT', 'HIGHUSDT', 'ETCUSDT', 'ETHUSDT', 'SOLUSDT', 'DOGEUSDT', 'LTCUSDT', 'SHIBUSDT', 'PLAUSDT', 'ONTUSDT', 'FARMUSDT', 'HARDUSDT', 'CHESSUSDT']
+whitelist = ['AMBUSDT', 'PNTUSDT', 'LSKUSDT', 'OMGUSDT', 'ATAUSDT','OCTUSDT', 'ICXUSDT', 'STMXUSDT', 'ARKUSDT', 'WLDUSDT', 'MBLUSDT', 'ZILUSDT', 'HIGHUSDT', 'ETCUSDT', 'ETHUSDT', 'SOLUSDT', 'DOGEUSDT', 'LTCUSDT', 'SHIBUSDT', 'PLAUSDT', 'ONTUSDT', 'FARMUSDT', 'HARDUSDT', 'CHESSUSDT']
 balances, tickets, info = [], [], []
 balance = float(client.get_asset_balance(asset='USDT')['free'])
 partOfBalance = 11
@@ -20,6 +20,11 @@ signalCounter = 0
 info = client.futures_exchange_info()
 coinInfos = []
 
+def checkTrend(coinInfo):
+    if coinInfo['prices'][-1] > coinInfo['prices'][1]:
+        coinInfo['trend'] = True
+    else:
+        coinInfo['trend'] = False 
 def checkVolatility(coinInfo):
     deviations = []
     EMA = sum(coinInfo['prices'][:-20:-1]) / 20
@@ -34,6 +39,14 @@ def get_precision(symbol):
    for x in info['symbols']:
     if x['symbol'] == symbol:
         return x['quantityPrecision']
+def supportAndDefence(coinInfo):
+    support = coinInfo['mins'][-1]
+    defence = coinInfo['maxs'][-1]
+    if coinInfo['prices'][-1] >= support:
+        coinInfo['buySignal'][5] = True
+    elif coinInfo['prices'][-1] <= defence:
+        coinInfo['buySingnal'][5] = False
+
 def CCIs(coinInfo):
     typicalPrice = coinInfo['prices'][-1]
     MA = sum(coinInfo['prices'][:-15:-1]) / len(coinInfo['prices'][:-15:-1])
@@ -150,7 +163,7 @@ def buy(coinInfo):
         print(coinInfo['symbol'])
 
 
-def sell(ticket):
+def sell(coinInfo, ticket):
     try:
         order = client.order_market_sell(
             symbol=ticket['symbol'],
@@ -163,6 +176,8 @@ def sell(ticket):
     except Exception as E:
         print(E)
 def appendPrices(coinInfo):
+    coinInfo['mins'].append(min(coinInfo['prices'][:-10:-1]))
+    coinInfo['maxs'].append(max(coinInfo['prices'][:-10:-1]))
     coin = coinInfo['symbol']
     price = float(tickers.loc[tickers['symbol'] == f'{coin}']['price'])
     coinInfo['prices'].append(price)
@@ -188,8 +203,11 @@ def makeCoinsJson(symbol):
         'mas' : [],
         'ccis' : [],
         'volatility' : [],
-        'buySignal' : [False, False, False, False, False],
-        'precision' : precision
+        'mins' : [],
+        'maxs' : [],
+        'buySignal' : [False, False, False, False, False, False],
+        'precision' : precision,
+        'trend' : False
     }
     coinInfos.append(coinInfo)
 def checkIndicators(coinInfo):
@@ -201,15 +219,17 @@ def checkIndicators(coinInfo):
         Fibo(coinInfo)
         Stochastic(coinInfo)
         CCIs(coinInfo)
+        supportAndDefence(coinInfo)
+        checkTrend(coinInfo)
         
     
     for i in coinInfo['buySignal']:
         if i == True:
             signalCounter += 1
-        if signalCounter >= 2 and coinInfo['volatility'] == True:
+        if signalCounter >= 2 and coinInfo['volatility'] == True and coinInfo['trend'] == True:
             buy(coinInfo)
             signalCounter = 0
-            coinInfo['buySignal'] = [False, False, False, False, False]            
+            coinInfo['buySignal'] = [False, False, False, False, False, False]            
 def makeStatistic(tickets):
     counterLoss = 1
     counterGain = 1
@@ -242,10 +262,8 @@ for i in range(2500):
         if len(coinInfo['prices']) > 5:
             checkIndicators(coinInfo)
             checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'][-1])
-    time.sleep(10)
+    time.sleep(60)
         
 for ticket in tickets:
     sell(ticket)
 makeStatistic(tickets)
-plt.plot(balances)
-plt.show()
