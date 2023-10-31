@@ -79,11 +79,12 @@ def Fibo(coinInfo):
 
 def Rsis(coinInfo):
     global counterRsi
-    diff = abs(coinInfo['prices'][-2] - coinInfo['prices'][-1])
+    diff = coinInfo['prices'][-2] - coinInfo['prices'][-1]
     counterRsi += 1
-    if len(coinInfo['prices']) > 2 and diff != 0:
+    if len(coinInfo['prices']) > 2 and diff > 0:
         coinInfo['avg_gain'] += diff
-    elif len(coinInfo['prices']) > 2 and diff != 0:
+    elif len(coinInfo['prices']) > 2 and diff < 0:
+        diff = abs(diff)
         coinInfo['avg_loss'] += diff
     
     if counterRsi > 50:
@@ -165,8 +166,6 @@ def buy(coinInfo):
                 tickets.append(Ticket)
     except Exception as E:
         print(E)
-        print(x)
-        print(precision)
         print(coinInfo['symbol'])
 
 
@@ -270,7 +269,7 @@ for i in range(1440):
         if len(coinInfo['prices']) > 5:
             checkIndicators(coinInfo)
             checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'][-1])
-    time.sleep(10)
+    time.sleep(60)
         
 for ticket in tickets:
     sell(ticket)
