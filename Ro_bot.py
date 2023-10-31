@@ -30,18 +30,16 @@ def checkVolatility(coinInfo):
         coinInfo['volatility'] = True
     else:
         coinInfo['volatility'] = False
-
 def get_precision(symbol):
    for x in info['symbols']:
     if x['symbol'] == symbol:
         return x['quantityPrecision']
-
 def CCIs(coinInfo):
     typicalPrice = coinInfo['prices'][-1]
     MA = sum(coinInfo['prices'][:-15:-1]) / len(coinInfo['prices'][:-15:-1])
     coinInfo['mas'].append(MA)
     if len(coinInfo['mas']) > 15:
-        meanDeviation = abs(sum(coinInfo['prices'][:-15:-1]) - sum(coinInfo['MAs'][:-15:-1])) / 15
+        meanDeviation = abs(sum(coinInfo['prices'][:-15:-1]) - sum(coinInfo['mas'][:-15:-1])) / 15
         CCI = (typicalPrice - MA) / (0.015 * meanDeviation)
         coinInfo['ccis'].append(CCI)
         if coinInfo['ccis'][-1] < -100:
@@ -63,6 +61,7 @@ def Fibo(coinInfo):
     if lastPrice < fibo[3] + fibo[3] * percents and lastPrice > fibo[3] - fibo[3] * percents:
         coinInfo['buySignal'][3] = True
     
+
 def Rsis(coinInfo):
     diff = coinInfo['prices'][-2] - coinInfo['prices'][-1]
     if len(coinInfo['prices']) > 2 and diff > 0:
@@ -79,6 +78,7 @@ def Rsis(coinInfo):
         elif RSI > 70 and RSI < 90:
             coinInfo['buySignal'][0] = False
     
+    
 def Mcds(CoinInfo):
     long_EMA = sum(CoinInfo['prices'][:-26:-1]) / len(CoinInfo['prices'][:-26:-1])
     short_EMA = sum(CoinInfo['prices'][:-12:-1]) / len(CoinInfo['prices'][:-12:-1])
@@ -94,6 +94,7 @@ def Mcds(CoinInfo):
     elif len(CoinInfo['macds']) > 10 and MACD - signal > 0.6 and MACD - signal < -0.6:
         CoinInfo['buySignal'][1] = False
         
+    
 def Stochastic(CoinInfo):
     priceLock = CoinInfo['prices'][-1]
     minimum = min(CoinInfo['prices'][:15])
@@ -105,7 +106,6 @@ def Stochastic(CoinInfo):
             CoinInfo['buySignal'][2] = True
         elif Stoch > 70:
             CoinInfo['buySignal'][2] = False
-
 def buy(coinInfo):
     try:
         balance = float(client.get_asset_balance(asset='USDT')['free'])
@@ -145,6 +145,7 @@ def buy(coinInfo):
         print(precision)
         print(coinInfo['symbol'])
 
+
 def sell(ticket):
     try:
         order = client.order_market_sell(
@@ -157,12 +158,10 @@ def sell(ticket):
         balances.append(balance)
     except Exception as E:
         print(E)
-
 def appendPrices(coinInfo):
     coin = coinInfo['symbol']
     price = float(tickers.loc[tickers['symbol'] == f'{coin}']['price'])
     coinInfo['prices'].append(price)
-
 def makeCoinsJson(symbol):
     precision = get_precision(symbol)
     if precision == 0 or precision == None:
@@ -189,7 +188,6 @@ def makeCoinsJson(symbol):
         'precision' : precision
     }
     coinInfos.append(coinInfo)
-
 def checkIndicators(coinInfo):
     global signalCounter
     if len(coinInfo['prices']) > 2:
@@ -208,7 +206,6 @@ def checkIndicators(coinInfo):
             buy(coinInfo)
             signalCounter = 0
             coinInfo['buySignal'] = [False, False, False, False]            
-
 def makeStatistic(tickets):
     counterLoss = 1
     counterGain = 1
@@ -222,7 +219,6 @@ def makeStatistic(tickets):
     
 for coin in whitelist:
     makeCoinsJson(coin)
-
 def checkTicketsToSell(tickets, price, symbol):
     for ticket in tickets:
         if ticket['symbol'] == symbol:
