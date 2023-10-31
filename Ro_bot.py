@@ -169,7 +169,7 @@ def buy(coinInfo):
         print(coinInfo['symbol'])
 
 
-def sell(coinInfo, ticket):
+def sell(ticket):
     try:
         order = client.order_market_sell(
             symbol=ticket['symbol'],
@@ -182,11 +182,11 @@ def sell(coinInfo, ticket):
     except Exception as E:
         print(E)
 def appendPrices(coinInfo):
+    coin = coinInfo['symbol']
+    price = tickers.loc[tickers['symbol'] == f'{coin}']['price'].astype(float)
     if len(coinInfo['prices']) > 11:
         coinInfo['mins'].append(min(coinInfo['prices'][:-10:-1]))
         coinInfo['maxs'].append(max(coinInfo['prices'][:-10:-1]))
-    coin = coinInfo['symbol']
-    price = tickers.loc[tickers['symbol'] == f'{coin}']['price'].astype(float)
     coinInfo['prices'].append(price)
 def makeCoinsJson(symbol):
     precision = get_precision(symbol)
