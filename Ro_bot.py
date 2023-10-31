@@ -1,4 +1,3 @@
-import pandas as pd
 from binance.client import Client
 import re
 import time
