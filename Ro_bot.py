@@ -106,17 +106,20 @@ def Stochastic(CoinInfo):
             CoinInfo['buySignal'][2] = True
         elif Stoch > 70:
             CoinInfo['buySignal'][2] = False
+def checkPrecision(coinInfo, precision):
+    if precision == 0 or precision == None:
+        precision = 1
+    else:
+        precision = int(precision)
+    x = round(coinInfo['prices'][-1], precision)
+    return x
 def buy(coinInfo):
     try:
         balance = float(client.get_asset_balance(asset='USDT')['free'])
         if float(balance) > partOfBalance:
             now = datetime.now()
             precision = get_precision(coinInfo['symbol'])
-            if precision == 0 or precision == None:
-                precision = 1
-            else:
-                precision = int(precision)
-            x = round(coinInfo['prices'][-1], precision)
+            x = checkPrecision(coinInfo, precision)
             if x > 0:
                 qty = partOfBalance / x
                 qty = round(qty, precision)
@@ -205,7 +208,7 @@ def checkIndicators(coinInfo):
         if signalCounter >= 2 and coinInfo['volatility'] == True:
             buy(coinInfo)
             signalCounter = 0
-            coinInfo['buySignal'] = [False, False, False, False]            
+            coinInfo['buySignal'] = [False, False, False, False, False]            
 def makeStatistic(tickets):
     counterLoss = 1
     counterGain = 1
@@ -238,7 +241,7 @@ for i in range(2500):
         if len(coinInfo['prices']) > 5:
             checkIndicators(coinInfo)
             checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'][-1])
-        time.sleep(10)
+    time.sleep(10)
         
 for ticket in tickets:
     sell(ticket)
