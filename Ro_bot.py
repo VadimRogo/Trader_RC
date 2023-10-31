@@ -19,6 +19,7 @@ partOfBalance = 11
 signalCounter = 0
 info = client.futures_exchange_info()
 coinInfos = []
+counterRsi = 0
 
 def checkTrend(coinInfo):
     if coinInfo['prices'][-1] > coinInfo['prices'][1]:
