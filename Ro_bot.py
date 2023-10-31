@@ -41,7 +41,7 @@ def Fibo(coinInfo):
     maximum = max(coinInfo['prices'][:-30:-1])
     fibo = [0.786 * maximum, 0.618 * maximum, 0.382 * maximum, 0.236 * maximum]
     percents = 0.02
-    lastPrice = coinInfo['price']
+    lastPrice = coinInfo['prices'][-1]
     if lastPrice < fibo[0] + fibo[0] * percents and lastPrice > fibo[0] - fibo[0] * percents:
         coinInfo['buySignal'][3] = True
     if lastPrice < fibo[1] + fibo[1] * percents and lastPrice > fibo[1] - fibo[1] * percents:
