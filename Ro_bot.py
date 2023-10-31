@@ -80,9 +80,7 @@ def Fibo(coinInfo):
 def Rsis(coinInfo):
     global counterRsi
     counterRsi += 1
-    difference = 0
-    print(coinInfo['prices'][-1])
-    print(type(coinInfo['prices'][-2]))
+    difference = coinInfo['prices'][-2] - coinInfo['prices'][-1]
     if (len(coinInfo['prices']) > 2) and difference > 0:
         coinInfo['avg_gain'] += difference
     elif (len(coinInfo['prices']) > 2) and difference < 0:
@@ -185,7 +183,7 @@ def sell(ticket):
         print(E)
 def appendPrices(coinInfo):
     coin = coinInfo['symbol']
-    price = tickers.loc[tickers['symbol'] == f'{coin}']['price'].astype(float)
+    price = float(tickers.loc[tickers['symbol'] == f'{coin}']['price'].tolist()[-1])
     if len(coinInfo['prices']) > 11:
         coinInfo['mins'].append(min(coinInfo['prices'][:-10:-1]))
         coinInfo['maxs'].append(max(coinInfo['prices'][:-10:-1]))
