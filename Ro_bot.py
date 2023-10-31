@@ -81,9 +81,9 @@ def Rsis(coinInfo):
     global counterRsi
     diff = coinInfo['prices'][-2] - coinInfo['prices'][-1]
     counterRsi += 1
-    if len(coinInfo['prices']) > 2 and diff > 0:
+    if (len(coinInfo['prices']) > 2) and (diff > 0):
         coinInfo['avg_gain'] += diff
-    elif len(coinInfo['prices']) > 2 and diff < 0:
+    elif (len(coinInfo['prices']) > 2) and (diff < 0):
         diff = abs(diff)
         coinInfo['avg_loss'] += diff
     
