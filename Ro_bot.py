@@ -1,3 +1,4 @@
+import pandas as pd
 from binance.client import Client
 import re
 import time
@@ -79,9 +80,10 @@ def Fibo(coinInfo):
 def Rsis(coinInfo):
     global counterRsi
     counterRsi += 1
-    if (len(coinInfo['prices']) > 2) and coinInfo['prices'][-2] - coinInfo['prices'][-1] > 0:
+    difference = float(coinInfo['prices'][-2]) - float(coinInfo['prices'][-1])
+    if (len(coinInfo['prices']) > 2) and difference > 0:
         coinInfo['avg_gain'] += difference
-    elif (len(coinInfo['prices']) > 2) and coinInfo['prices'][-2] - coinInfo['prices'][-1] < 0:
+    elif (len(coinInfo['prices']) > 2) and difference < 0:
         difference = abs(difference)
         coinInfo['avg_loss'] += difference
     
