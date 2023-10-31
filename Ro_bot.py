@@ -121,8 +121,8 @@ def buy(coinInfo):
                 Ticket = {
                     'symbol' : coinInfo['symbol'],
                     'price' : coinInfo['prices'][-1],
-                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] / 100 * 0.2,
-                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1] / 100 * 0.2,
+                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.015,
+                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.02,
                     'qty' : qty,
                     'time' : now,
                     'sold' : False,
@@ -219,14 +219,14 @@ def checkTicketsToSell(tickets, price, symbol):
                 sell(ticket)
                 ticket['status'] = 'loss'
 
-for i in range(1250):
+for i in range(250):
     for coinInfo in coinInfos:
         appendPrices(coinInfo)
         balance = float(client.get_asset_balance(asset='USDT')['free'])
         if len(coinInfo['prices']) > 5:
             checkIndicators(coinInfo)
             checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'][-1])
-        time.sleep(60)
+        time.sleep(10)
         
 for ticket in tickets:
     sell(ticket)
