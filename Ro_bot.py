@@ -64,7 +64,7 @@ def CCIs(coinInfo):
                 coinInfo['buySignal'][4] = False
 
 def Fibo(coinInfo):
-    maximum = max(coinInfo['prices'][:-30:-1])
+    maximum = max(coinInfo['prices'][:-15:-1])
     fibo = [0.786 * maximum, 0.618 * maximum, 0.382 * maximum, 0.236 * maximum]
     percents = 0.02
     lastPrice = coinInfo['prices'][-1]
@@ -102,33 +102,34 @@ def Rsis(coinInfo):
             coinInfo['buySignal'][0] = False
     
     
-def Mcds(CoinInfo):
-    long_EMA = sum(CoinInfo['prices'][:-26:-1]) / len(CoinInfo['prices'][:-26:-1])
-    short_EMA = sum(CoinInfo['prices'][:-12:-1]) / len(CoinInfo['prices'][:-12:-1])
-    short_diff_EMA = sum(CoinInfo['prices'][:-9:-1]) / len(CoinInfo['prices'][:-9:-1])
-    CoinInfo['long_EMA'].append(long_EMA)
-    CoinInfo['short_EMA'].append(short_EMA)
-    CoinInfo['short_diff_EMA'].append(short_diff_EMA)
-    MACD = round(CoinInfo['short_EMA'][-1] - CoinInfo['long_EMA'][-1], 3)
-    signal = short_diff_EMA * (short_EMA - long_EMA)
-    CoinInfo['macds'].append(MACD)
-    if len(CoinInfo['macds']) > 10 and MACD - signal > -0.6 and MACD - signal < 0.6:
-        CoinInfo['buySignal'][1] = True
-    elif len(CoinInfo['macds']) > 10 and MACD - signal > 0.6 and MACD - signal < -0.6:
-        CoinInfo['buySignal'][1] = False
-        
+def Mcds(coinInfo):
+    if len(coinInfo['prices']) > 26:
+        long_EMA = sum(coinInfo['prices'][:-26:-1]) / len(coinInfo['prices'][:-26:-1])
+        short_EMA = sum(coinInfo['prices'][:-12:-1]) / len(coinInfo['prices'][:-12:-1])
+        short_diff_EMA = sum(coinInfo['prices'][:-9:-1]) / len(coinInfo['prices'][:-9:-1])
+        coinInfo['long_EMA'].append(long_EMA)
+        coinInfo['short_EMA'].append(short_EMA)
+        coinInfo['short_diff_EMA'].append(short_diff_EMA)
+        MACD = round(coinInfo['short_EMA'][-1] - coinInfo['long_EMA'][-1], 3)
+        signal = short_diff_EMA * (short_EMA - long_EMA)
+        coinInfo['macds'].append(MACD)
+        if len(coinInfo['macds']) > 10 and MACD - signal > -0.6 and MACD - signal < 0.6:
+            coinInfo['buySignal'][1] = True
+        elif len(coinInfo['macds']) > 10 and MACD - signal > 0.6 and MACD - signal < -0.6:
+            coinInfo['buySignal'][1] = False
+            
     
-def Stochastic(CoinInfo):
-    priceLock = CoinInfo['prices'][-1]
-    minimum = min(CoinInfo['prices'][:15])
-    maximum = max(CoinInfo['prices'][:15])
+def Stochastic(coinInfo):
+    priceLock = coinInfo['prices'][-1]
+    minimum = min(coinInfo['prices'][:15])
+    maximum = max(coinInfo['prices'][:15])
     if minimum - maximum != 0:
         Stoch = (priceLock - minimum) / (maximum - minimum) * 100
-        CoinInfo['stoch'].append(Stoch)
-        if len(CoinInfo['stoch']) > 10 and Stoch < 20:
-            CoinInfo['buySignal'][2] = True
+        coinInfo['stoch'].append(Stoch)
+        if len(coinInfo['stoch']) > 10 and Stoch < 20:
+            coinInfo['buySignal'][2] = True
         elif Stoch > 70:
-            CoinInfo['buySignal'][2] = False
+            coinInfo['buySignal'][2] = False
 def checkPrecision(coinInfo, precision):
     if precision == 0 or precision == None:
         precision = 1
@@ -220,17 +221,15 @@ def makeCoinsJson(symbol):
     coinInfos.append(coinInfo)
 def checkIndicators(coinInfo):
     global signalCounter
-    if len(coinInfo['prices']) > 2:
-        Rsis(coinInfo)
-    if len(coinInfo['prices']) > 15:
-        Mcds(coinInfo)
-        Fibo(coinInfo)
-        Stochastic(coinInfo)
-        CCIs(coinInfo)
-        supportAndDefence(coinInfo)
-        checkTrend(coinInfo)
-        checkVolatility(coinInfo)
-        
+    Rsis(coinInfo)
+    Mcds(coinInfo)
+    Fibo(coinInfo)
+    Stochastic(coinInfo)
+    CCIs(coinInfo)
+    supportAndDefence(coinInfo)
+    checkTrend(coinInfo)
+    checkVolatility(coinInfo)
+    
     
     for i in coinInfo['buySignal']:
         if i == True:
@@ -265,11 +264,11 @@ def checkTicketsToSell(tickets, price, symbol):
 
 for i in range(1440):
     if i % 10 == 0:
-        print('cycle, ', i)
+        print('cycle ', i)
     for coinInfo in coinInfos:
         appendPrices(coinInfo)
         balance = float(client.get_asset_balance(asset='USDT')['free'])
-        if len(coinInfo['prices']) > 5:
+        if len(coinInfo['prices']) > 15:
             checkIndicators(coinInfo)
             checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'][-1])
     time.sleep(60)
