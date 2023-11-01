@@ -22,17 +22,20 @@ coinInfos = []
 counterRsi = 0
 
 def checkTrend(coinInfo):
-    if coinInfo['prices'][-1] > coinInfo['prices'][1]:
-        coinInfo['trend'] = True
+    if len(coinInfo['prices']) > 26:
+        if coinInfo['prices'][-1] > coinInfo['prices'][-25]:
+            coinInfo['trend'] = True
+        else:
+            coinInfo['trend'] = False
     else:
-        coinInfo['trend'] = False 
+        coinInfo['trend'] = True 
 def checkVolatility(coinInfo):
     deviations = []
     EMA = sum(coinInfo['prices'][:-20:-1]) / 20
     for i in coinInfo['prices'][:-20:-1]:
-        deviations.append(abs(EMA - i) ** 2)
+        deviations.append(abs(EMA - i))
     standartDeviations = sum(deviations) / len(deviations)
-    if standartDeviations >= coinInfo['prices'][-1] * 0.03:
+    if standartDeviations >= coinInfo['prices'][-1] * 0.02:
         coinInfo['volatility'] = True
     else:
         coinInfo['volatility'] = False
@@ -156,7 +159,7 @@ def buy(coinInfo):
                 Ticket = {
                     'symbol' : coinInfo['symbol'],
                     'price' : coinInfo['prices'][-1],
-                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.015,
+                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.05,
                     'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.02,
                     'qty' : qty,
                     'time' : now,
