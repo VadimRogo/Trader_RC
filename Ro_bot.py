@@ -264,7 +264,8 @@ def checkTicketsToSell(tickets, price, symbol):
                 ticket['status'] = 'loss'
 
 for i in range(1440):
-    print('cycle ', i)
+    if i % 10 == 0:
+        print('cycle, ', i)
     for coinInfo in coinInfos:
         appendPrices(coinInfo)
         balance = float(client.get_asset_balance(asset='USDT')['free'])
