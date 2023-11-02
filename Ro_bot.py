@@ -249,7 +249,7 @@ def checkIndicators(coinInfo):
     for i in coinInfo['buySignal']:
         if i == True:
             signalCounter += 1
-        if signalCounter >= 2 and coinInfo['volatility'] == True and coinInfo['trend'] == True:
+        if signalCounter >= 2:
             buy(coinInfo, parseSignals(coinInfo))
             signalCounter = 0
             coinInfo['buySignal'] = [False, False, False, False, False, False]            
