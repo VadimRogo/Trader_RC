@@ -2,7 +2,8 @@ import pandas as pd
 from binance.client import Client
 import re
 import time
-import json
+import json 
+import requests 
 from datetime import datetime
 import matplotlib.pyplot as plt
 api_key = 'z7Ltgm7gB1OBsvRiSPCuYOIq7CHMXEVT1ch4vnGuuxZ4I9kaKc7gwLbmd6n3HBJ2'
@@ -186,10 +187,10 @@ def sell(ticket):
         print(E)
 def appendPrices(coinInfo):
     try:
-        tickers = client.get_all_tickers()
-        tickers = pd.DataFrame(tickers)
-        coin = coinInfo['symbol']
-        price = float(tickers.loc[tickers['symbol'] == f'{coin}']['price'].tolist()[-1])
+        key = f"https://api.binance.com/api/v3/ticker/price?symbol={coinInfo['symbol']}"
+        data = requests.get(key)   
+        data = data.json() 
+        price = data['price']
         if len(coinInfo['prices']) > 11:
             coinInfo['mins'].append(min(coinInfo['prices'][:-10:-1]))
             coinInfo['maxs'].append(max(coinInfo['prices'][:-10:-1]))
