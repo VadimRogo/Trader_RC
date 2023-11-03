@@ -48,7 +48,7 @@ def supportAndDefence(coinInfo):
     if coinInfo['prices'][-1] >= support:
         coinInfo['buySignal'][5] = True
     elif coinInfo['prices'][-1] <= defence:
-        coinInfo['buySingnal'][5] = False
+        coinInfo['buySignal'][5] = False
 
 
 def CCIs(coinInfo):
@@ -277,9 +277,9 @@ for coin in whitelist:
     makeCoinsJson(coin)
 def checkTicketsToSell(tickets, price, symbol):
     for ticket in tickets:
-        if ticket['symbol'] == symbol:
-            print('We waiting ', ticket['takeprofit'], 'or', ticket['stoploss'])
-            if price > ticket['takeprofit']:
+        if ticket['symbol'] == symbol and ticket['sold'] == False:
+            print('We waiting ', ticket['takeprofit'], 'or', ticket['stoploss'], 'pricenow', price)
+            if price > ticket['takeprofit']     :
                 sell(ticket)
                 ticket['status'] = 'gain'
             elif price < ticket['stoploss']:
