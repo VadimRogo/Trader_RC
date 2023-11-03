@@ -159,8 +159,8 @@ def buy(coinInfo, signals):
                 Ticket = {
                     'symbol' : coinInfo['symbol'],
                     'price' : coinInfo['prices'][-1],
-                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.035,
-                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.05,
+                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.015,
+                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.02,
                     'qty' : qty,
                     'time' : now,
                     'sold' : False,
@@ -256,7 +256,7 @@ def checkIndicators(coinInfo):
         for i in coinInfo['buySignal']:
             if i == True:
                 signalCounter += 1
-            if signalCounter >= 2:
+            if signalCounter >= 2 and coinInfo['trend'] and coinInfo['volatility']:
                 buy(coinInfo, parseSignals(coinInfo))
                 signalCounter = 0
                 coinInfo['buySignal'] = [False, False, False, False, False, False]            
@@ -278,7 +278,7 @@ for coin in whitelist:
 def checkTicketsToSell(tickets, price, symbol):
     for ticket in tickets:
         if ticket['symbol'] == symbol:
-            print('We waiting ', ticket['price'] + ticket['price'] * 0.005)
+            print('We waiting ', ticket['takeprofit'], 'or', ticket['stoploss'])
             if price > ticket['takeprofit']:
                 sell(ticket)
                 ticket['status'] = 'gain'
@@ -286,7 +286,7 @@ def checkTicketsToSell(tickets, price, symbol):
                 sell(ticket)
                 ticket['status'] = 'loss'
 
-for i in range(1440):
+for i in range(2880):
     if i % 10 == 0:
         print('cycle ', i)
     for coinInfo in coinInfos:
@@ -294,7 +294,7 @@ for i in range(1440):
         balance = float(client.get_asset_balance(asset='USDT')['free'])
         if len(coinInfo['prices']) > 15:
             checkIndicators(coinInfo)
-            checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'][-1])
+            checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'])
     time.sleep(30)
         
 for ticket in tickets:
