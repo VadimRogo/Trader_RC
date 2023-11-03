@@ -185,12 +185,17 @@ def sell(ticket):
     except Exception as E:
         print(E)
 def appendPrices(coinInfo):
-    coin = coinInfo['symbol']
-    price = float(tickers.loc[tickers['symbol'] == f'{coin}']['price'].tolist()[-1])
-    if len(coinInfo['prices']) > 11:
-        coinInfo['mins'].append(min(coinInfo['prices'][:-10:-1]))
-        coinInfo['maxs'].append(max(coinInfo['prices'][:-10:-1]))
-    coinInfo['prices'].append(price)
+    try:
+        tickers = client.get_all_tickers()
+        tickers = pd.DataFrame(tickers)
+        coin = coinInfo['symbol']
+        price = float(tickers.loc[tickers['symbol'] == f'{coin}']['price'].tolist()[-1])
+        if len(coinInfo['prices']) > 11:
+            coinInfo['mins'].append(min(coinInfo['prices'][:-10:-1]))
+            coinInfo['maxs'].append(max(coinInfo['prices'][:-10:-1]))
+        coinInfo['prices'].append(price)
+    except Exception as E:
+        print(E)
 def makeCoinsJson(symbol):
     precision = get_precision(symbol)
     if precision == 0 or precision == None:
@@ -236,23 +241,26 @@ def parseSignals(coinInfo):
         signals.append('SUPDEF')
     return signals
 def checkIndicators(coinInfo):
-    global signalCounter
-    Rsis(coinInfo)
-    Mcds(coinInfo)
-    Fibo(coinInfo)
-    Stochastic(coinInfo)
-    CCIs(coinInfo)
-    supportAndDefence(coinInfo)
-    checkTrend(coinInfo)
-    checkVolatility(coinInfo)
-    
-    for i in coinInfo['buySignal']:
-        if i == True:
-            signalCounter += 1
-        if signalCounter >= 2:
-            buy(coinInfo, parseSignals(coinInfo))
-            signalCounter = 0
-            coinInfo['buySignal'] = [False, False, False, False, False, False]            
+    try:
+        global signalCounter
+        Rsis(coinInfo)
+        Mcds(coinInfo)
+        Fibo(coinInfo)
+        Stochastic(coinInfo)
+        CCIs(coinInfo)
+        supportAndDefence(coinInfo)
+        checkTrend(coinInfo)
+        checkVolatility(coinInfo)
+        
+        for i in coinInfo['buySignal']:
+            if i == True:
+                signalCounter += 1
+            if signalCounter >= 2:
+                buy(coinInfo, parseSignals(coinInfo))
+                signalCounter = 0
+                coinInfo['buySignal'] = [False, False, False, False, False, False]            
+    except Exception as E:
+        print(E)
 def makeStatistic(tickets):
     counterLoss = 1
     counterGain = 1
