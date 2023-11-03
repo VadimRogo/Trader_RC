@@ -190,7 +190,7 @@ def appendPrices(coinInfo):
         key = f"https://api.binance.com/api/v3/ticker/price?symbol={coinInfo['symbol']}"
         data = requests.get(key)   
         data = data.json() 
-        price = int(data['price'])
+        price = float(data['price'])
         if len(coinInfo['prices']) > 11:
             coinInfo['mins'].append(min(coinInfo['prices'][:-10:-1]))
             coinInfo['maxs'].append(max(coinInfo['prices'][:-10:-1]))
@@ -295,7 +295,7 @@ for i in range(1440):
         if len(coinInfo['prices']) > 15:
             checkIndicators(coinInfo)
             checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'][-1])
-    time.sleep(60)
+    time.sleep(30)
         
 for ticket in tickets:
     sell(ticket)
