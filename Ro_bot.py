@@ -132,22 +132,23 @@ def Rsis(coinInfo):
             coinInfo['buySignal'][0] = False
     
 
-def checkPrecision(coinInfo, precision):
+def checkPrecision(precision):
     if precision == 0 or precision == None:
         precision = 1
     else:
         precision = int(precision)
-    x = round(coinInfo['prices'][-1], precision)
-    return x
+    # x = round(coinInfo['prices'][-1], precision)
+    # return x
+    return precision
 def buy(coinInfo, signals):
     try:
         balance = float(client.get_asset_balance(asset='USDT')['free'])
         if float(balance) > partOfBalance:
             now = datetime.now()
             precision = get_precision(coinInfo['symbol'])
-            x = checkPrecision(coinInfo, precision)
-            if x > 0:
-                qty = partOfBalance / x
+            precision = checkPrecision(precision)
+            if precision > 0:
+                qty = partOfBalance / coinInfo['prices'][-1]
                 qty = round(qty, precision)
                 # print(qty)
                 order = client.create_order(
@@ -188,7 +189,7 @@ def sell(ticket):
     except Exception as E:
         print(E)
         print("We try to correct quantity ", ticket['symbol'], ticket['qty'])
-        ticket['qty'] = round(float(client.get_asset_balance(asset=f"{ticket['symbol']}".replace("USDT", ''))['free']))
+        ticket['qty'] = float(client.get_asset_balance(asset=f"{ticket['symbol']}".replace("USDT", ''))['free'])
 def appendPrices(coinInfo):
     try:
         key = f"https://api.binance.com/api/v3/ticker/price?symbol={coinInfo['symbol']}"
@@ -290,7 +291,7 @@ def checkTicketsToSell(tickets, price, symbol):
                 sell(ticket)
                 ticket['status'] = 'loss'
 
-for i in range(1440):
+for i in range(2880):
     if i % 10 == 0:
         print('cycle ', i)
     for coinInfo in coinInfos:
@@ -299,7 +300,7 @@ for i in range(1440):
         if len(coinInfo['prices']) > 15:
             checkIndicators(coinInfo)
             checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'])
-    time.sleep(60)
+    time.sleep(30)
         
 for ticket in tickets:
     sell(ticket)
