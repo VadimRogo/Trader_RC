@@ -188,7 +188,8 @@ def sell(ticket):
     except Exception as E:
         print(E)
         print("We try to correct quantity ", ticket['symbol'], ticket['qty'])
-        ticket['qty'] = (float(client.get_asset_balance(asset=f"{ticket['symbol']}".replace("USDT", ''))['free']), float(ticket['precision'])-1)
+        ticket['qty'] = round(float(client.get_asset_balance(asset=f"{ticket['symbol']}".replace("USDT", ''))['free']) * 0.99, ticket['precision'])
+        sell(ticket)
 def appendPrices(coinInfo):
     try:
         key = f"https://api.binance.com/api/v3/ticker/price?symbol={coinInfo['symbol']}"
