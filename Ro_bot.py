@@ -137,7 +137,7 @@ def checkPrecision(coinInfo, precision):
         precision = 1
     else:
         precision = int(precision)
-    x = math.floor(coinInfo['prices'][-1], precision)
+    x = round(coinInfo['prices'][-1], precision)
     return x
 def buy(coinInfo, signals):
     try:
@@ -188,7 +188,7 @@ def sell(ticket):
     except Exception as E:
         print(E)
         print("We try to correct quantity ", ticket['symbol'], ticket['qty'])
-        ticket['qty'] = math.floor(float(client.get_asset_balance(asset=f"{ticket['symbol']}".replace("USDT", ''))['free']), ticket['precision'])
+        ticket['qty'] = round(float(client.get_asset_balance(asset=f"{ticket['symbol']}".replace("USDT", ''))['free']))
 def appendPrices(coinInfo):
     try:
         key = f"https://api.binance.com/api/v3/ticker/price?symbol={coinInfo['symbol']}"
