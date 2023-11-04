@@ -132,23 +132,22 @@ def Rsis(coinInfo):
             coinInfo['buySignal'][0] = False
     
 
-def checkPrecision(precision):
+def checkPrecision(coinInfo, precision):
     if precision == 0 or precision == None:
         precision = 1
     else:
         precision = int(precision)
-    # x = round(coinInfo['prices'][-1], precision)
-    # return x
-    return precision
+    x = round(coinInfo['prices'][-1], precision)
+    return x
 def buy(coinInfo, signals):
     try:
         balance = float(client.get_asset_balance(asset='USDT')['free'])
         if float(balance) > partOfBalance:
             now = datetime.now()
             precision = get_precision(coinInfo['symbol'])
-            precision = checkPrecision(precision)
-            if precision > 0:
-                qty = partOfBalance / coinInfo['prices'][-1]
+            x = checkPrecision(coinInfo, precision)
+            if x > 0:
+                qty = partOfBalance / x
                 qty = round(qty, precision)
                 # print(qty)
                 order = client.create_order(
@@ -161,8 +160,8 @@ def buy(coinInfo, signals):
                 Ticket = {
                     'symbol' : coinInfo['symbol'],
                     'price' : coinInfo['prices'][-1],
-                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.004,
-                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.002,
+                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.01,
+                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.005,
                     'qty' : qty,
                     'time' : now,
                     'sold' : False,
@@ -189,7 +188,7 @@ def sell(ticket):
     except Exception as E:
         print(E)
         print("We try to correct quantity ", ticket['symbol'], ticket['qty'])
-        ticket['qty'] = float(client.get_asset_balance(asset=f"{ticket['symbol']}".replace("USDT", ''))['free'])
+        ticket['qty'] = (float(client.get_asset_balance(asset=f"{ticket['symbol']}".replace("USDT", ''))['free']), float(ticket['precision'])-1)
 def appendPrices(coinInfo):
     try:
         key = f"https://api.binance.com/api/v3/ticker/price?symbol={coinInfo['symbol']}"
