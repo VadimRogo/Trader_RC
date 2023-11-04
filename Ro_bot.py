@@ -6,6 +6,7 @@ import json
 import requests 
 from datetime import datetime
 import matplotlib.pyplot as plt
+import math
 api_key = 'z7Ltgm7gB1OBsvRiSPCuYOIq7CHMXEVT1ch4vnGuuxZ4I9kaKc7gwLbmd6n3HBJ2'
 api_secret = '3h3ylP3VtH6Rtvm83aoHrcI8erMjZfNeX6MAgRGnSHL1srkvu2WcJlUnH1fq59LX'
 
@@ -136,7 +137,7 @@ def checkPrecision(coinInfo, precision):
         precision = 1
     else:
         precision = int(precision)
-    x = round(coinInfo['prices'][-1], precision)
+    x = math.floor(coinInfo['prices'][-1], precision)
     return x
 def buy(coinInfo, signals):
     try:
@@ -148,7 +149,7 @@ def buy(coinInfo, signals):
             if x > 0:
                 qty = partOfBalance / x
                 qty = round(qty, precision)
-                print(qty)
+                # print(qty)
                 order = client.create_order(
                     symbol=coinInfo['symbol'],
                     side=Client.SIDE_BUY,
@@ -159,13 +160,14 @@ def buy(coinInfo, signals):
                 Ticket = {
                     'symbol' : coinInfo['symbol'],
                     'price' : coinInfo['prices'][-1],
-                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.015,
-                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.02,
+                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.004,
+                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.002,
                     'qty' : qty,
                     'time' : now,
                     'sold' : False,
                     'status' : '',
-                    'signals' : signals
+                    'signals' : signals,
+                    'precision' : coinInfo['precision']
                 }
                 tickets.append(Ticket)
     except Exception as E:
@@ -185,6 +187,8 @@ def sell(ticket):
         balances.append(balance)
     except Exception as E:
         print(E)
+        print("We try to correct quantity ", ticket['symbol'], ticket['qty'])
+        ticket['qty'] = math.floor(float(client.get_asset_balance(asset=f"{ticket['symbol']}".replace("USDT", ''))['free']), ticket['precision'])
 def appendPrices(coinInfo):
     try:
         key = f"https://api.binance.com/api/v3/ticker/price?symbol={coinInfo['symbol']}"
@@ -278,7 +282,7 @@ for coin in whitelist:
 def checkTicketsToSell(tickets, price, symbol):
     for ticket in tickets:
         if ticket['symbol'] == symbol and ticket['sold'] == False:
-            print('We waiting ', ticket['takeprofit'], 'or', ticket['stoploss'], 'pricenow', price)
+            # print('We waiting ', ticket['takeprofit'], 'or', ticket['stoploss'], 'pricenow', price)
             if price > ticket['takeprofit']     :
                 sell(ticket)
                 ticket['status'] = 'gain'
@@ -286,7 +290,7 @@ def checkTicketsToSell(tickets, price, symbol):
                 sell(ticket)
                 ticket['status'] = 'loss'
 
-for i in range(2880):
+for i in range(1440):
     if i % 10 == 0:
         print('cycle ', i)
     for coinInfo in coinInfos:
@@ -295,7 +299,7 @@ for i in range(2880):
         if len(coinInfo['prices']) > 15:
             checkIndicators(coinInfo)
             checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'])
-    time.sleep(30)
+    time.sleep(60)
         
 for ticket in tickets:
     sell(ticket)
