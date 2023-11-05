@@ -14,7 +14,7 @@ client = Client(api_key, api_secret)
 
 tickers = client.get_all_tickers()
 tickers = pd.DataFrame(tickers)
-whitelist = ['COMPUSDT', 'EGLDUSDT', 'KSMUSDT', 'ENSUSDST', 'DEXEUSDT', 'SNTUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'FILUSDT', 'YFIUSDT', 'ETHUSDT', 'MKRUSDT', 'BIFIUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'MANAUSDT', 'SHIBUSDT']
+whitelist = ['COMPUSDT', 'EGLDUSDT', 'SNTUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'ETHUSDT', 'MKRUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'MANAUSDT', 'SHIBUSDT']
 balances, tickets, info = [], [], []
 balance = float(client.get_asset_balance(asset='USDT')['free'])
 partOfBalance = 11
