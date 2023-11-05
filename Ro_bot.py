@@ -292,15 +292,18 @@ def checkTicketsToSell(tickets, price, symbol):
                 ticket['status'] = 'loss'
 
 for i in range(2880):
-    if i % 10 == 0:
-        print('cycle ', i)
-    for coinInfo in coinInfos:
-        appendPrices(coinInfo)
-        balance = float(client.get_asset_balance(asset='USDT')['free'])
-        if len(coinInfo['prices']) > 15:
-            checkIndicators(coinInfo)
-            checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'])
-    time.sleep(30)
+    try:
+        if i % 10 == 0:
+            print('cycle ', i)
+        for coinInfo in coinInfos:
+            appendPrices(coinInfo)
+            balance = float(client.get_asset_balance(asset='USDT')['free'])
+            if len(coinInfo['prices']) > 15:
+                checkIndicators(coinInfo)
+                checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'])
+        time.sleep(30)
+    except Exception as E:
+        print(E)
         
 for ticket in tickets:
     sell(ticket)
