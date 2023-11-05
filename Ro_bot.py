@@ -14,7 +14,7 @@ client = Client(api_key, api_secret)
 
 tickers = client.get_all_tickers()
 tickers = pd.DataFrame(tickers)
-whitelist = ['SNTUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'APEUSDT', 'CRVUSDT', 'FILUSDT', 'DEGOUSDT', 'KLAYUSDT', 'PENDLEUSDT', 'YFIUSDT', 'PAXGUSDT', 'WBETHUSDT', 'ETHUSDT', 'MKRUSDT', 'BIFIUSDT', 'BCHUSDT', 'SOLUSDT', 'DASHUSDT', 'ZECUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'MANAUSDT', 'SHIBUSDT']
+whitelist = ['SNTUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'APEUSDT', 'CRVUSDT', 'FILUSDT', 'DEGOUSDT', 'PENDLEUSDT', 'YFIUSDT', 'PAXGUSDT', 'WBETHUSDT', 'ETHUSDT', 'MKRUSDT', 'BIFIUSDT', 'DASHUSDT', 'ZECUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'MANAUSDT', 'SHIBUSDT']
 balances, tickets, info = [], [], []
 balance = float(client.get_asset_balance(asset='USDT')['free'])
 partOfBalance = 11
@@ -177,6 +177,7 @@ def buy(coinInfo, signals):
 
 def sell(ticket):
     try:
+        counter = 0
         order = client.order_market_sell(
             symbol=ticket['symbol'],
             quantity=ticket['qty']
@@ -188,8 +189,7 @@ def sell(ticket):
     except Exception as E:
         print(E)
         print("We try to correct quantity ", ticket['symbol'], ticket['qty'])
-        ticket['qty'] = math.floor(float(client.get_asset_balance(asset=f"{ticket['symbol']}".replace("USDT", ''))['free']) * 0.99)
-        sell(ticket)
+        ticket['qty'] = (float(client.get_asset_balance(asset=f"{ticket['symbol']}".replace("USDT", ''))['free']))
 def appendPrices(coinInfo):
     try:
         key = f"https://api.binance.com/api/v3/ticker/price?symbol={coinInfo['symbol']}"
