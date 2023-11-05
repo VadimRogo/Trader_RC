@@ -14,7 +14,7 @@ client = Client(api_key, api_secret)
 
 tickers = client.get_all_tickers()
 tickers = pd.DataFrame(tickers)
-whitelist = ['SNTUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'APEUSDT', 'CRVUSDT', 'FILUSDT', 'DEGOUSDT', 'PENDLEUSDT', 'YFIUSDT', 'PAXGUSDT', 'WBETHUSDT', 'ETHUSDT', 'MKRUSDT', 'BIFIUSDT', 'DASHUSDT', 'ZECUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'MANAUSDT', 'SHIBUSDT']
+whitelist = ['COMPUSDT', 'EGLDUSDT', 'KSMUSDT', 'ENSUSDST', 'DEXEUSDT', 'SNTUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'FILUSDT', 'YFIUSDT', 'ETHUSDT', 'MKRUSDT', 'BIFIUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'MANAUSDT', 'SHIBUSDT']
 balances, tickets, info = [], [], []
 balance = float(client.get_asset_balance(asset='USDT')['free'])
 partOfBalance = 11
@@ -178,9 +178,10 @@ def buy(coinInfo, signals):
 def sell(ticket):
     try:
         counter = 0
+        precision = ticket['precision']
         order = client.order_market_sell(
             symbol=ticket['symbol'],
-            quantity=ticket['qty']
+            quantity=round(ticket['qty'] * 0.99, precision)
             )
         print('Sold ', ticket['symbol'])
         ticket['sold'] = True
@@ -188,8 +189,7 @@ def sell(ticket):
         balances.append(balance)
     except Exception as E:
         print(E)
-        print("We try to correct quantity ", ticket['symbol'], ticket['qty'])
-        ticket['qty'] = (float(client.get_asset_balance(asset=f"{ticket['symbol']}".replace("USDT", ''))['free']))
+        print("THAT COIN IN THE FUCKING BLACKLIST ", ticket['symbol'], ticket['qty'])
 def appendPrices(coinInfo):
     try:
         key = f"https://api.binance.com/api/v3/ticker/price?symbol={coinInfo['symbol']}"
