@@ -181,15 +181,20 @@ def sell(ticket):
         precision = ticket['precision']
         order = client.order_market_sell(
             symbol=ticket['symbol'],
-            quantity=round(ticket['qty'] * 0.99, precision)
+            quantity=round(ticket['qty'])
             )
         print('Sold ', ticket['symbol'])
         ticket['sold'] = True
         balance = float(client.get_asset_balance(asset='USDT')['free'])
         balances.append(balance)
     except Exception as E:
-        print(E)
-        print("THAT COIN IN THE FUCKING BLACKLIST ", ticket['symbol'], ticket['qty'])
+        balance = float(client.get_asset_balance(asset=f"{ticket['symbol'].replace('USDT', '')}")['free'])
+        quantity = ticket['qty']
+        while quantity > balance:
+            quantity = round(quantity * 0.999, ticket['precision'])
+        ticket['qty'] = quantity
+        
+        
 def appendPrices(coinInfo):
     try:
         key = f"https://api.binance.com/api/v3/ticker/price?symbol={coinInfo['symbol']}"
