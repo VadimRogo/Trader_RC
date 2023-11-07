@@ -150,7 +150,7 @@ def buy(coinInfo, signals):
         if float(balance) > partOfBalance:
             now = datetime.now()
             precision = get_precision(coinInfo['symbol'])
-            x = checkPrecision(coinInfo['symbol'])
+            x = checkPrecision(coinInfo['symbol'], precision)
             if x > 0:
                 qty = partOfBalance / x
                 qty = round(qty, precision)
