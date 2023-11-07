@@ -48,6 +48,13 @@ def get_precision(symbol):
         else:
             precision = int(precision)
         return precision
+def checkPrecision(coinInfo, precision):
+    if precision == 0 or precision == None:
+        precision = 1
+    else:
+        precision = int(precision)
+    x = round(coinInfo['prices'][-1], precision)
+    return x
 def supportAndDefence(coinInfo):
     support = coinInfo['mins'][-1]
     defence = coinInfo['maxs'][-1]
@@ -143,7 +150,7 @@ def buy(coinInfo, signals):
         if float(balance) > partOfBalance:
             now = datetime.now()
             precision = get_precision(coinInfo['symbol'])
-            x = get_precision(coinInfo['symbol'])
+            x = checkPrecision(coinInfo['symbol'])
             if x > 0:
                 qty = partOfBalance / x
                 qty = round(qty, precision)
