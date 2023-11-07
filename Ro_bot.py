@@ -188,11 +188,15 @@ def sell(ticket):
         balance = float(client.get_asset_balance(asset='USDT')['free'])
         balances.append(balance)
     except Exception as E:
-        balance = float(client.get_asset_balance(asset=f"{ticket['symbol'].replace('USDT', '')}")['free'])
-        quantity = ticket['qty']
-        while quantity > balance:
-            quantity = round(quantity * 0.999, ticket['precision'])
-        ticket['qty'] = quantity
+        counter = 0
+        quantity = balance
+        while quantity >= balance:
+            counter += 1
+            quantity = quantity * 0.98
+            print(ticket['symbol'], quantity, balance, counter)
+            math.floor(quantity)
+        quantity = round(quantity, precision)
+        sell(ticket['symbol'], quantity, precision)
         
         
 def appendPrices(coinInfo):
@@ -309,6 +313,8 @@ for i in range(2880):
         time.sleep(30)
     except Exception as E:
         print(E)
+        client = Client(api_key, api_secret)
+
         
 for ticket in tickets:
     sell(ticket)
