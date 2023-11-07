@@ -14,7 +14,7 @@ client = Client(api_key, api_secret)
 
 tickers = client.get_all_tickers()
 tickers = pd.DataFrame(tickers)
-whitelist = ['COMPUSDT', 'EGLDUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'ETHUSDT', 'MKRUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
+whitelist = ['COMPUSDT', 'EGLDUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'ETHUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
 balances, tickets, info = [], [], []
 balance = float(client.get_asset_balance(asset='USDT')['free'])
 partOfBalance = 12
@@ -42,7 +42,12 @@ def checkVolatility(coinInfo):
 def get_precision(symbol):
    for x in info['symbols']:
     if x['symbol'] == symbol:
-        return x['quantityPrecision']
+        precision = x['quantityPrecision']
+        if precision == 0 or precision == None:
+            precision = 1
+        else:
+            precision = int(precision)
+        return precision
 def supportAndDefence(coinInfo):
     support = coinInfo['mins'][-1]
     defence = coinInfo['maxs'][-1]
@@ -132,20 +137,13 @@ def Rsis(coinInfo):
             coinInfo['buySignal'][0] = False
     
 
-def checkPrecision(coinInfo, precision):
-    if precision == 0 or precision == None:
-        precision = 1
-    else:
-        precision = int(precision)
-    x = round(coinInfo['prices'][-1], precision)
-    return x
 def buy(coinInfo, signals):
     try:
         balance = float(client.get_asset_balance(asset='USDT')['free'])
         if float(balance) > partOfBalance:
             now = datetime.now()
             precision = get_precision(coinInfo['symbol'])
-            x = checkPrecision(coinInfo, precision)
+            x = get_precision(coinInfo['symbol'])
             if x > 0:
                 qty = partOfBalance / x
                 qty = round(qty, precision)
@@ -180,7 +178,7 @@ def sell(ticket):
         precision = ticket['precision']
         order = client.order_market_sell(
             symbol=ticket['symbol'],
-            quantity=round(ticket['qty'])
+            quantity=ticket['qty']
             )
         print('Sold ', ticket['symbol'])
         ticket['sold'] = True
