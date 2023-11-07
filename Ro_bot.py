@@ -190,14 +190,13 @@ def sell(ticket):
     except Exception as E:
         counter = 0
         balance = float(client.get_asset_balance(asset=f"{ticket['symbol'].replace('USDT', '')}")['free'])
-        quantity = balance
-        while quantity >= balance:
+        
+        while ticket['qty'] >= balance:
             counter += 1
-            quantity = quantity * 0.98
-            print(ticket['symbol'], quantity, balance, counter)
-            math.floor(quantity)
-        quantity = round(quantity, precision)
-        ticket['qty'] = quantity
+            ticket['qty'] = ticket['qty'] * 0.98
+            ticket['qty'] = round(ticket['qty'], precision)
+            print(ticket['symbol'], ticket['qty'], balance, counter)
+        ticket['qty'] = round(ticket['qty'], precision)
         sell(ticket)
         
         
