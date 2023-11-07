@@ -182,7 +182,6 @@ def buy(coinInfo, signals):
 
 def sell(ticket):
     try:
-        precision = ticket['precision']
         order = client.order_market_sell(
             symbol=ticket['symbol'],
             quantity=ticket['qty']
@@ -192,13 +191,28 @@ def sell(ticket):
         balance = float(client.get_asset_balance(asset='USDT')['free'])
         balances.append(balance)
     except Exception as E:
-        quantity = ticket['qty']
-        while ticket['qty'] >= quantity:
-            ticket['qty'] = ticket['qty'] * 0.98
-            math.floor(quantity)
-            print(ticket['symbol'], ticket['qty'], quantity)
-        ticket['qty'] = round(ticket['qty'], precision)
-        sell(ticket)
+        balance_coin = float(client.get_asset_balance(asset=f"{ticket['symbol'].replace('USDT', '')}")['free'])
+        balance_usdt = balance_coin * ticket['price']
+        if balance_usdt >= 5:
+            order = client.order_market_sell(
+                symbol=ticket['symbol'],
+                quantity=balance_coin
+                )
+            print(f"Sold ", ticket['symbol'])
+            balance = float(client.get_asset_balance(asset='USDT')['free'])
+            balances.append(balance)
+        else:
+            ticket['sold'] = True
+
+        
+        
+        
+        # while ticket['qty'] >= balance:
+        #     ticket['qty'] = ticket['qty'] * 0.98
+        #     round(ticket['qty'], ticket['precision'])
+        #     print(ticket['symbol'], ticket['qty'], quantity)
+        # ticket['qty'] = round(ticket['qty'], ticket['precision'])
+        # sell(ticket)
         
         
 def appendPrices(coinInfo):
