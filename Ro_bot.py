@@ -177,7 +177,6 @@ def buy(coinInfo, signals):
 
 def sell(ticket):
     try:
-        counter = 0
         precision = ticket['precision']
         order = client.order_market_sell(
             symbol=ticket['symbol'],
@@ -188,14 +187,11 @@ def sell(ticket):
         balance = float(client.get_asset_balance(asset='USDT')['free'])
         balances.append(balance)
     except Exception as E:
-        percents = 0.99
-        balance = float(client.get_asset_balance(asset=f"{ticket['symbol'].replace('USDT', '')}")['free'])
-        
-        while ticket['qty'] >= balance:
-            percents = percents - 0.01
-            ticket['qty'] = ticket['qty'] * percents
-            ticket['qty'] = round(ticket['qty'], precision)
-            print(ticket['symbol'], ticket['qty'], percents, counter)
+        quantity = ticket['qty']
+        while ticket['qty'] >= quantity:
+            ticket['qty'] = ticket['qty'] * 0.98
+            math.floor(quantity)
+            print(ticket['symbol'], ticket['qty'], quantity)
         ticket['qty'] = round(ticket['qty'], precision)
         sell(ticket)
         
