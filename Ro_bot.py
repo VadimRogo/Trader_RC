@@ -189,6 +189,7 @@ def sell(ticket):
         balances.append(balance)
     except Exception as E:
         counter = 0
+        balance = float(client.get_asset_balance(asset=f"{ticket['symbol'].replace('USDT', '')}")['free'])
         quantity = balance
         while quantity >= balance:
             counter += 1
