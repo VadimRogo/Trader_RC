@@ -33,9 +33,9 @@ def sell(coin, balance, precision):
         quantity = balance
         )
         print(f'Sold  {coin}')
-        quantity = balance
     except Exception as E:
         counter = 0
+        quantity = balance
         while quantity >= balance:
             counter += 1
             quantity = quantity * 0.98

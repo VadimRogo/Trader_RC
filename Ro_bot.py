@@ -197,7 +197,8 @@ def sell(ticket):
             print(ticket['symbol'], quantity, balance, counter)
             math.floor(quantity)
         quantity = round(quantity, precision)
-        sell(ticket['symbol'], quantity, precision)
+        ticket['qty'] = quantity
+        sell(ticket)
         
         
 def appendPrices(coinInfo):
