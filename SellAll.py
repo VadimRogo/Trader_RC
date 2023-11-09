@@ -13,7 +13,7 @@ api_secret = '3h3ylP3VtH6Rtvm83aoHrcI8erMjZfNeX6MAgRGnSHL1srkvu2WcJlUnH1fq59LX'
 
 client = Client(api_key, api_secret)
 
-whitelist = ['COMPUSDT', 'EGLDUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'ETHUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
+whitelist = ['COMPUSDT', 'EGLDUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
 info = client.futures_exchange_info()
 precision = 1
 def get_precision(symbol):
