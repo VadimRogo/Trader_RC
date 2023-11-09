@@ -13,7 +13,7 @@ api_secret = '3h3ylP3VtH6Rtvm83aoHrcI8erMjZfNeX6MAgRGnSHL1srkvu2WcJlUnH1fq59LX'
 
 client = Client(api_key, api_secret)
 
-whitelist = ['COMPUSDT', 'EGLDUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
+whitelist = ['FILUSDT', 'XMRUSDT', 'XLMUSDT', 'DAIUSDT', 'DOTUSDT', 'MATICUSDT', 'TRXUSDT', 'DOGEUSDT','COMPUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
 info = client.futures_exchange_info()
 precision = 1
 def get_precision(symbol):
@@ -26,23 +26,22 @@ def get_precision(symbol):
             precision = int(precision)
         return precision
 
-def sell(coin, balance, precision):
+def sell(coin, balance, precision, counter):
     try:
         order = client.order_market_sell(
         symbol = coin,
-        quantity = balance
+        quantity = round(balance, precision)
         )
         print(f'Sold  {coin}')
     except Exception as E:
-        counter = 0
+        print(E)
+        balance = float(client.get_asset_balance(asset=f"{coin.replace('USDT', '')}")['free'])
         quantity = balance
         while quantity >= balance:
-            counter += 1
-            quantity = quantity * 0.98
+            quantity = quantity * (counter / 100)
             print(coin, quantity, balance, counter)
-            math.floor(quantity)
-        quantity = round(quantity, precision)
-        sell(coin, quantity, precision)
+            quantity = round(quantity, precision)
+        sell(coin, quantity, precision, counter)
 
 def appendPrices(coin):
     try:
@@ -57,8 +56,9 @@ def appendPrices(coin):
 for coin in whitelist:
     balance = float(client.get_asset_balance(asset=f"{coin.replace('USDT', '')}")['free'])
     balance_usdt = balance * appendPrices(coin)
+    counter = 99
     if balance_usdt > 5:
-        sell(coin, balance, get_precision(coin))
+        sell(coin, balance, get_precision(coin), counter)
 
 import math
 

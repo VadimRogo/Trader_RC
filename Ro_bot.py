@@ -14,10 +14,11 @@ client = Client(api_key, api_secret)
 
 tickers = client.get_all_tickers()
 tickers = pd.DataFrame(tickers)
-whitelist = ['COMPUSDT', 'EGLDUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
+
+whitelist = ['FILUSDT', 'XMRUSDT', 'XLMUSDT', 'DAIUSDT', 'DOTUSDT', 'MATICUSDT', 'TRXUSDT', 'DOGEUSDT','COMPUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
 balances, tickets, info = [], [], []
 balance = float(client.get_asset_balance(asset='USDT')['free'])
-partOfBalance = 12
+partOfBalance = 11
 signalCounter = 0
 info = client.futures_exchange_info()
 coinInfos = []
@@ -161,7 +162,7 @@ def buy(coinInfo, signals):
                     type=Client.ORDER_TYPE_MARKET,
                     quantity=qty
                 )
-                print("Bouth ", coinInfo['symbol'], ' price ', coinInfo['prices'][-1])
+                print("Bouth ", coinInfo['symbol'], ' price ', coinInfo['prices'][-1], 'because', signals)
                 Ticket = {
                     'symbol' : coinInfo['symbol'],
                     'price' : coinInfo['prices'][-1],
@@ -302,7 +303,7 @@ def makeStatistic(tickets):
         elif i['status'] == 'gain':
             counterGain += 1
         statistic = counterGain / counterLoss * 100
-        print('Statistic - ', statistic)
+    print('Statistic - ', statistic)
     
 for coin in whitelist:
     makeCoinsJson(coin)
