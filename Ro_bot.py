@@ -194,17 +194,10 @@ def sell(ticket):
     except Exception as E:
         balance_coin = float(client.get_asset_balance(asset=f"{ticket['symbol'].replace('USDT', '')}")['free'])
         balance_usdt = balance_coin * ticket['price']
-        print(f"We correct quantity of {ticket['symbol']}")
-        if balance_usdt >= 5:
-            order = client.order_market_sell(
-                symbol=ticket['symbol'],
-                quantity=balance_coin
-                )
-            print(f"Sold ", ticket['symbol'])
-            balance = float(client.get_asset_balance(asset='USDT')['free'])
-            balances.append(balance)
-        elif balance_usdt <= 5:
-            ticket['sold'] = True
+        ticket['qty'] = math.floor(ticket['qty'] * 10 ** ticket['precision']) / 10 ** ticket['precision']
+        sell(ticket)
+        balance = float(client.get_asset_balance(asset='USDT')['free'])
+        balances.append(balance)
         
 def appendPrices(coinInfo):
     try:
