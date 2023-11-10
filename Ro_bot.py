@@ -15,10 +15,10 @@ client = Client(api_key, api_secret)
 tickers = client.get_all_tickers()
 tickers = pd.DataFrame(tickers)
 
-whitelist = ['XMRUSDT', 'XLMUSDT', 'DAIUSDT', 'DOTUSDT', 'MATICUSDT', 'DOGEUSDT','COMPUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
+whitelist = ['XMRUSDT', 'XLMUSDT', 'DAIUSDT', 'DOTUSDT', 'MATICUSDT', 'DOGEUSDT','COMPUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
 balances, tickets, info = [], [], []
 balance = float(client.get_asset_balance(asset='USDT')['free'])
-partOfBalance = 11
+partOfBalance = 15
 signalCounter = 0
 info = client.futures_exchange_info()
 coinInfos = []
@@ -166,8 +166,8 @@ def buy(coinInfo, signals):
                 Ticket = {
                     'symbol' : coinInfo['symbol'],
                     'price' : coinInfo['prices'][-1],
-                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.025,
-                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.015,
+                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.012,
+                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.009,
                     'qty' : qty,
                     'time' : now,
                     'sold' : False,

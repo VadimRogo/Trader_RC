@@ -13,7 +13,7 @@ api_secret = '3h3ylP3VtH6Rtvm83aoHrcI8erMjZfNeX6MAgRGnSHL1srkvu2WcJlUnH1fq59LX'
 
 client = Client(api_key, api_secret)
 
-whitelist = ['FILUSDT', 'XMRUSDT', 'XLMUSDT', 'DAIUSDT', 'DOTUSDT', 'MATICUSDT', 'TRXUSDT', 'DOGEUSDT','COMPUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
+whitelist = ['XMRUSDT', 'XLMUSDT', 'DAIUSDT', 'DOTUSDT', 'MATICUSDT', 'DOGEUSDT','COMPUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
 info = client.futures_exchange_info()
 precision = 1
 def get_precision(symbol):
@@ -21,12 +21,12 @@ def get_precision(symbol):
     if x['symbol'] == symbol:
         precision = x['quantityPrecision']
         if precision == 0 or precision == None:
-            precision = 1
+            precision = 0
         else:
             precision = int(precision)
         return precision
 
-def sell(coin, balance, precision, counter):
+def sell(coin, balance, precision):
     try:
         order = client.order_market_sell(
         symbol = coin,
@@ -38,10 +38,10 @@ def sell(coin, balance, precision, counter):
         balance = float(client.get_asset_balance(asset=f"{coin.replace('USDT', '')}")['free'])
         quantity = balance
         while quantity >= balance:
-            quantity = quantity * (counter / 100)
-            print(coin, quantity, balance, counter)
+            quantity = math.floor(quantity * 10 ** precision) / 10 ** precision
+            print(coin, quantity, balance)
             quantity = round(quantity, precision)
-        sell(coin, quantity, precision, counter)
+        sell(coin, quantity, precision)
 
 def appendPrices(coin):
     try:
@@ -56,11 +56,7 @@ def appendPrices(coin):
 for coin in whitelist:
     balance = float(client.get_asset_balance(asset=f"{coin.replace('USDT', '')}")['free'])
     balance_usdt = balance * appendPrices(coin)
-    counter = 99
     if balance_usdt > 5:
-        sell(coin, balance, get_precision(coin), counter)
-
-import math
-
+        sell(coin, balance, get_precision(coin))
 
 
