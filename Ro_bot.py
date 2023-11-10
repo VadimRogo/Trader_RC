@@ -15,7 +15,7 @@ client = Client(api_key, api_secret)
 tickers = client.get_all_tickers()
 tickers = pd.DataFrame(tickers)
 
-whitelist = ['FILUSDT', 'XMRUSDT', 'XLMUSDT', 'DAIUSDT', 'DOTUSDT', 'MATICUSDT', 'TRXUSDT', 'DOGEUSDT','COMPUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
+whitelist = ['XMRUSDT', 'XLMUSDT', 'DAIUSDT', 'DOTUSDT', 'MATICUSDT', 'DOGEUSDT','COMPUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'AVAXUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
 balances, tickets, info = [], [], []
 balance = float(client.get_asset_balance(asset='USDT')['free'])
 partOfBalance = 11
@@ -166,8 +166,8 @@ def buy(coinInfo, signals):
                 Ticket = {
                     'symbol' : coinInfo['symbol'],
                     'price' : coinInfo['prices'][-1],
-                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.01,
-                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.005,
+                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.025,
+                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.015,
                     'qty' : qty,
                     'time' : now,
                     'sold' : False,
@@ -205,17 +205,6 @@ def sell(ticket):
             balances.append(balance)
         elif balance_usdt <= 5:
             ticket['sold'] = True
-
-        
-        
-        
-        # while ticket['qty'] >= balance:
-        #     ticket['qty'] = ticket['qty'] * 0.98
-        #     round(ticket['qty'], ticket['precision'])
-        #     print(ticket['symbol'], ticket['qty'], quantity)
-        # ticket['qty'] = round(ticket['qty'], ticket['precision'])
-        # sell(ticket)
-        
         
 def appendPrices(coinInfo):
     try:
@@ -288,7 +277,7 @@ def checkIndicators(coinInfo):
         for i in coinInfo['buySignal']:
             if i == True:
                 signalCounter += 1
-            if signalCounter >= 2 and coinInfo['trend'] and coinInfo['volatility']:
+            if signalCounter >= 3 and coinInfo['trend'] and coinInfo['volatility']:
                 buy(coinInfo, parseSignals(coinInfo))
                 signalCounter = 0
                 coinInfo['buySignal'] = [False, False, False, False, False, False]            
