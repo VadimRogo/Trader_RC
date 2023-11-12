@@ -194,7 +194,8 @@ def sell(ticket):
     except Exception as E:
         balance_coin = float(client.get_asset_balance(asset=f"{ticket['symbol'].replace('USDT', '')}")['free'])
         balance_usdt = balance_coin * ticket['price']
-        ticket['qty'] = math.floor(balance_coin * (10 ** ticket['precision'])) / (10 ** ticket['precision'])
+        ticket['qty'] = math.floor(balance_coin * (10 ** ticket['precision']) * 0.999) / (10 ** ticket['precision'])
+        ticket['qty'] = round(ticket['qty'], ticket['precision'])
         sell(ticket)
         balance = float(client.get_asset_balance(asset='USDT')['free'])
         balances.append(balance)
