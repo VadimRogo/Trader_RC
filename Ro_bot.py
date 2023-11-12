@@ -194,12 +194,24 @@ def sell(ticket):
     except Exception as E:
         balance_coin = float(client.get_asset_balance(asset=f"{ticket['symbol'].replace('USDT', '')}")['free'])
         balance_usdt = balance_coin * ticket['price']
-        ticket['qty'] = math.floor(balance_coin * (10 ** ticket['precision']) * 0.999) / (10 ** ticket['precision'])
-        ticket['qty'] = round(ticket['qty'], ticket['precision'])
-        sell(ticket)
+        quantity = math.floor(balance_coin * (10 ** ticket['precision']) * 0.999) / (10 ** ticket['precision'])
+        qunatity = round(ticket['qty'], ticket['precision'])
+        errorSell(ticket, quantity)
         balance = float(client.get_asset_balance(asset='USDT')['free'])
         balances.append(balance)
-        
+
+def errorSell(ticket, quantity):
+    try:
+        order = client.order_market_sell(
+            symbol=ticket['symbol'],
+            quantity=quantity
+            )
+        print('Sold before error', ticket['symbol'])
+        ticket['sold'] = True
+        balance = float(client.get_asset_balance(asset='USDT')['free'])
+        balances.append(balance)
+    except Exception as E:
+        print("Okey it doesn't work")
 def appendPrices(coinInfo):
     try:
         key = f"https://api.binance.com/api/v3/ticker/price?symbol={coinInfo['symbol']}"
@@ -301,7 +313,7 @@ def checkTicketsToSell(tickets, price, symbol):
                 sell(ticket)
                 ticket['status'] = 'loss'
 
-for i in range(2880):
+for i in range(1440):
     try:
         if i % 10 == 0:
             print('cycle ', i)
@@ -311,7 +323,7 @@ for i in range(2880):
             if len(coinInfo['prices']) > 15:
                 checkIndicators(coinInfo)
                 checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'])
-        time.sleep(15)
+        time.sleep(60)
     except Exception as E:
         print(E)
         client = Client(api_key, api_secret)
