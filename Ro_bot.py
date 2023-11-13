@@ -32,7 +32,7 @@ counterRsi = 0
 def startTelebot():
     id = 1660691311
     bot.send_message(id, "We start a work, let's see what statistic will be", parse_mode='Markdown')
-    bot.polling(none_stop=True, interval=0)
+    
 
 def sendStatistic(statistic):
     bot.send_message(id, statistic)
@@ -348,3 +348,5 @@ for i in range(1440):
 for ticket in tickets:
     sell(ticket)
 makeStatistic(tickets)
+
+bot.polling(none_stop=True, interval=0)
