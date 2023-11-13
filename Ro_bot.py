@@ -15,10 +15,10 @@ client = Client(api_key, api_secret)
 tickers = client.get_all_tickers()
 tickers = pd.DataFrame(tickers)
 
-whitelist = ['XMRUSDT', 'XLMUSDT', 'DAIUSDT', 'DOTUSDT', 'MATICUSDT', 'DOGEUSDT','COMPUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
+whitelist = ['XMRUSDT', 'ARKMUSDT', 'TRXUSDT', 'REIUSDT', 'LTOUSDT', 'CKBUSDT', 'SUNISDT', 'DAIUSDT', 'DOTUSDT', 'MATICUSDT', 'DOGEUSDT','COMPUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
 balances, tickets, info = [], [], []
 balance = float(client.get_asset_balance(asset='USDT')['free'])
-partOfBalance = 15
+partOfBalance = 12
 signalCounter = 0
 info = client.futures_exchange_info()
 coinInfos = []
@@ -36,7 +36,7 @@ def checkVolatility(coinInfo):
     for i in coinInfo['prices'][:-15:-1]:
         deviations.append(abs(EMA - i))
     standartDeviations = sum(deviations) / len(deviations)
-    if standartDeviations >= coinInfo['prices'][-1] * 0.002:
+    if standartDeviations >= coinInfo['prices'][-1] * 0.012:
         coinInfo['volatility'] = True
     else:
         coinInfo['volatility'] = False
@@ -131,7 +131,7 @@ def Rsis(coinInfo):
         difference = abs(difference)
         coinInfo['avg_loss'] += difference
     
-    if counterRsi > 25:
+    if counterRsi > 50:
         coinInfo['avg_gain'] = 1
         coinInfo['avg_loss'] = 1
 
@@ -166,8 +166,8 @@ def buy(coinInfo, signals):
                 Ticket = {
                     'symbol' : coinInfo['symbol'],
                     'price' : coinInfo['prices'][-1],
-                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.012,
-                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.009,
+                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.025,
+                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.015,
                     'qty' : qty,
                     'time' : now,
                     'sold' : False,
