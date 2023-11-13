@@ -7,6 +7,11 @@ import requests
 from datetime import datetime
 import matplotlib.pyplot as plt
 import math
+import telebot
+from telebot import types
+bot = telebot.TeleBot('6312689394:AAE0wejoCqGdUDprRpXjIc401zCmN21SVl4')
+
+
 api_key = 'z7Ltgm7gB1OBsvRiSPCuYOIq7CHMXEVT1ch4vnGuuxZ4I9kaKc7gwLbmd6n3HBJ2'
 api_secret = '3h3ylP3VtH6Rtvm83aoHrcI8erMjZfNeX6MAgRGnSHL1srkvu2WcJlUnH1fq59LX'
 
@@ -15,7 +20,7 @@ client = Client(api_key, api_secret)
 tickers = client.get_all_tickers()
 tickers = pd.DataFrame(tickers)
 
-whitelist = ['XMRUSDT', 'ARKMUSDT', 'TRXUSDT', 'REIUSDT', 'LTOUSDT', 'CKBUSDT', 'SUNUSDT', 'DAIUSDT', 'DOTUSDT', 'MATICUSDT', 'DOGEUSDT','COMPUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
+whitelist = ['XMRUSDT', 'ARKMUSDT', 'TRXUSDT', 'REIUSDT', 'LTOUSDT', 'CKBUSDT', 'SUNISDT', 'DAIUSDT', 'DOTUSDT', 'MATICUSDT', 'DOGEUSDT','COMPUSDT', 'BAKEUSDT', 'KEYUSDT', 'RLCUSDT', 'CRVUSDT', 'ATOMUSDT', 'GASUSDT', 'SHIBUSDT']
 balances, tickets, info = [], [], []
 balance = float(client.get_asset_balance(asset='USDT')['free'])
 partOfBalance = 12
@@ -24,6 +29,13 @@ info = client.futures_exchange_info()
 coinInfos = []
 counterRsi = 0
 
+def startTelebot():
+    id = 1660691311
+    bot.send_message(id, "We start a work, let's see what statistic will be", parse_mode='Markdown')
+    bot.polling(none_stop=True, interval=0)
+
+def sendStatistic(statistic):
+    bot.send_message(id, statistic)
 def checkTrend(coinInfo):
     if coinInfo['prices'][-1] > coinInfo['prices'][-15]:
         coinInfo['trend'] = True
@@ -56,13 +68,13 @@ def checkPrecision(coinInfo, precision):
         precision = int(precision)
     x = round(coinInfo['prices'][-1], precision)
     return x
-def supportAndDefence(coinInfo):
-    support = coinInfo['mins'][-1]
-    defence = coinInfo['maxs'][-1]
-    if coinInfo['prices'][-1] >= support:
-        coinInfo['buySignal'][5] = True
-    elif coinInfo['prices'][-1] <= defence:
-        coinInfo['buySignal'][5] = False
+# def supportAndDefence(coinInfo):
+#     support = coinInfo['mins'][-1]
+#     defence = coinInfo['maxs'][-1]
+#     if coinInfo['prices'][-1] >= support:
+#         coinInfo['buySignal'][5] = True
+#     elif coinInfo['prices'][-1] <= defence:
+#         coinInfo['buySignal'][5] = False
 
 
 def CCIs(coinInfo):
@@ -271,12 +283,13 @@ def parseSignals(coinInfo):
 def checkIndicators(coinInfo):
     try:
         global signalCounter
+        signalCounter = 0
         Rsis(coinInfo)
         Mcds(coinInfo)
         Fibo(coinInfo)
         Stochastic(coinInfo)
         CCIs(coinInfo)
-        supportAndDefence(coinInfo)
+        # supportAndDefence(coinInfo)
         checkTrend(coinInfo)
         checkVolatility(coinInfo)
         
@@ -297,7 +310,8 @@ def makeStatistic(tickets):
             counterLoss += 1
         elif i['status'] == 'gain':
             counterGain += 1
-        statistic = counterGain / counterLoss * 100
+    statistic = counterGain / counterLoss * 100
+    sendStatistic(statistic)
     print('Statistic - ', statistic)
     
 for coin in whitelist:
@@ -312,11 +326,13 @@ def checkTicketsToSell(tickets, price, symbol):
             elif price < ticket['stoploss']:
                 sell(ticket)
                 ticket['status'] = 'loss'
-
+startTelebot()
 for i in range(1440):
     try:
         if i % 10 == 0:
             print('cycle ', i)
+        if i % 100 == 0:
+            makeStatistic(tickets)
         for coinInfo in coinInfos:
             appendPrices(coinInfo)
             balance = float(client.get_asset_balance(asset='USDT')['free'])
