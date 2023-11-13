@@ -27,15 +27,15 @@ partOfBalance = 12
 signalCounter = 0
 info = client.futures_exchange_info()
 coinInfos = []
+id = 1660691311
 counterRsi = 0
 
 def startTelebot():
-    id = 1660691311
     bot.send_message(id, "We start a work, let's see what statistic will be", parse_mode='Markdown')
     
 
 def sendStatistic(statistic):
-    bot.send_message(id, statistic)
+    bot.send_message(id, str(statistic), parse_mode='Markdown')
 def checkTrend(coinInfo):
     if coinInfo['prices'][-1] > coinInfo['prices'][-15]:
         coinInfo['trend'] = True
