@@ -35,7 +35,7 @@ def startTelebot():
     
 
 def sendStatistic(statistic):
-    bot.send_message(id, str(statistic), parse_mode='Markdown')
+    bot.send_message(id, str(statistic) + str(len(tickets)), parse_mode='Markdown')
 def checkTrend(coinInfo):
     if coinInfo['prices'][-1] > coinInfo['prices'][-15]:
         coinInfo['trend'] = True
@@ -178,8 +178,8 @@ def buy(coinInfo, signals):
                 Ticket = {
                     'symbol' : coinInfo['symbol'],
                     'price' : coinInfo['prices'][-1],
-                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.025,
-                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.015,
+                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.012,
+                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.025,
                     'qty' : qty,
                     'time' : now,
                     'sold' : False,
