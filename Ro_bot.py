@@ -48,7 +48,7 @@ def checkVolatility(coinInfo):
     for i in coinInfo['prices'][:-15:-1]:
         deviations.append(abs(EMA - i))
     standartDeviations = sum(deviations) / len(deviations)
-    if standartDeviations >= coinInfo['prices'][-1] * 0.012:
+    if standartDeviations >= coinInfo['prices'][-1] * 0.002:
         coinInfo['volatility'] = True
     else:
         coinInfo['volatility'] = False
