@@ -178,7 +178,7 @@ def buy(coinInfo, signals):
                 Ticket = {
                     'symbol' : coinInfo['symbol'],
                     'price' : coinInfo['prices'][-1],
-                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.012,
+                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.07,
                     'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.025,
                     'qty' : qty,
                     'time' : now,
@@ -327,7 +327,7 @@ def checkTicketsToSell(tickets, price, symbol):
                 sell(ticket)
                 ticket['status'] = 'loss'
 startTelebot()
-for i in range(1440):
+for i in range(2880):
     try:
         if i % 10 == 0:
             print('cycle ', i)
@@ -339,7 +339,7 @@ for i in range(1440):
             if len(coinInfo['prices']) > 15:
                 checkIndicators(coinInfo)
                 checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'])
-        time.sleep(60)
+        time.sleep(30)
     except Exception as E:
         print(E)
         client = Client(api_key, api_secret)
