@@ -36,6 +36,8 @@ def startTelebot():
 
 def sendStatistic(statistic):
     bot.send_message(id, str(statistic) + ' num of tickets - '+ str(len(tickets)), parse_mode='Markdown')
+def sendLose(symbol):
+    bot.send_message(id, f'We need to sell this coin {symbol}')
 def checkTrend(coinInfo):
     if coinInfo['prices'][-1] > coinInfo['prices'][-15]:
         coinInfo['trend'] = True
@@ -183,6 +185,7 @@ def buy(coinInfo, signals):
                     'qty' : qty,
                     'time' : now,
                     'sold' : False,
+                    'income' : 0,
                     'status' : '',
                     'signals' : signals,
                     'precision' : coinInfo['precision']
@@ -200,17 +203,18 @@ def sell(ticket):
             quantity=ticket['qty']
             )
         print('Sold ', ticket['symbol'])
-        ticket['sold'] = True
+        ticket['sold'] = True 
         balance = float(client.get_asset_balance(asset='USDT')['free'])
         balances.append(balance)
     except Exception as E:
         balance_coin = float(client.get_asset_balance(asset=f"{ticket['symbol'].replace('USDT', '')}")['free'])
         balance_usdt = balance_coin * ticket['price']
-        quantity = math.floor(balance_coin * (10 ** ticket['precision']) * 0.999) / (10 ** ticket['precision'])
-        qunatity = round(ticket['qty'], ticket['precision'])
-        errorSell(ticket, quantity)
-        balance = float(client.get_asset_balance(asset='USDT')['free'])
-        balances.append(balance)
+        if balance_usdt > 10:
+            quantity = math.floor(balance_coin * (10 ** ticket['precision']) * 0.999) / (10 ** ticket['precision'])
+            qunatity = round(ticket['qty'], ticket['precision'])
+            errorSell(ticket, quantity)
+            balance = float(client.get_asset_balance(asset='USDT')['free'])
+            balances.append(balance)
 
 def errorSell(ticket, quantity):
     try:
@@ -223,7 +227,27 @@ def errorSell(ticket, quantity):
         balance = float(client.get_asset_balance(asset='USDT')['free'])
         balances.append(balance)
     except Exception as E:
+        print(ticket['symbol'])
         print("Okey it doesn't work")
+        counter = 0 
+        while True:
+            try:
+                quantity = math.floor(quantity * (10 ** ticket['precision']) * 0.99) / (10 ** ticket['precision'])
+                quantity = round(ticket['qty'], ticket['precision'])
+                order = client.order_market_sell(
+                    symbol=ticket['symbol'],
+                    quantity=quantity
+                )
+                print('sold before error error')
+            except:
+                counter += 1
+                if counter == 5:
+                    print('We lose all')
+                    sendLose(ticket['symbol'])
+                    ticket['sold'] = True
+                    break
+
+
 def appendPrices(coinInfo):
     try:
         key = f"https://api.binance.com/api/v3/ticker/price?symbol={coinInfo['symbol']}"
