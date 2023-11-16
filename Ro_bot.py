@@ -318,13 +318,15 @@ def checkIndicators(coinInfo):
     try:
         global signalCounter
         signalCounter = 0
+        print('RSI')
         Rsis(coinInfo)
         Mcds(coinInfo)
-        if len(coinInfo['prices']) >= 46:
-            Fibo(coinInfo)
+        Fibo(coinInfo)
         Stochastic(coinInfo)
         CCIs(coinInfo)
+        print('Supp')
         supportAndDefence(coinInfo)
+        print('Vola and trend')
         checkTrend(coinInfo)
         checkVolatility(coinInfo)
         
