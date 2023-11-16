@@ -321,7 +321,8 @@ def checkIndicators(coinInfo):
         signalCounter = 0
         Rsis(coinInfo)
         Mcds(coinInfo)
-        Fibo(coinInfo)
+        if len(coinInfo['prices']) >= 46:
+            Fibo(coinInfo)
         Stochastic(coinInfo)
         CCIs(coinInfo)
         supportAndDefence(coinInfo)
