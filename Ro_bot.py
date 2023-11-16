@@ -318,18 +318,16 @@ def checkIndicators(coinInfo):
     try:
         global signalCounter
         signalCounter = 0
-        print('1')
         Rsis(coinInfo)
-        print('1')
         Mcds(coinInfo)
-        print('1')
         Fibo(coinInfo)
-        print('1')
         Stochastic(coinInfo)
-        print('1')
         CCIs(coinInfo)
+        print('1')
         supportAndDefence(coinInfo)
+        print('1')
         checkTrend(coinInfo)
+        print('1')
         checkVolatility(coinInfo)
         
         for i in coinInfo['buySignal']:
