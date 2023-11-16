@@ -140,7 +140,6 @@ def Mcds(coinInfo):
             
 def Rsis(coinInfo):
     global counterRsi
-    counterRsi += 1
     difference = coinInfo['prices'][-2] - coinInfo['prices'][-1]
     if (len(coinInfo['prices']) > 2) and difference > 0:
         coinInfo['avg_gain'] += difference
@@ -148,7 +147,7 @@ def Rsis(coinInfo):
         difference = abs(difference)
         coinInfo['avg_loss'] += difference
     
-    if counterRsi > 75:
+    if len(coinInfo['rsis']) > 75:
         coinInfo['avg_gain'] = 1
         coinInfo['avg_loss'] = 1
 
