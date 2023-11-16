@@ -29,17 +29,19 @@ info = client.futures_exchange_info()
 coinInfos = []
 id = 1660691311
 counterRsi = 0
+takeProfitPercents = 0.007
+stopLossPercents = 0.025
 
 def startTelebot():
     bot.send_message(id, "We start a work, let's see what statistic will be", parse_mode='Markdown')
     
 
-def sendStatistic(statistic):
-    bot.send_message(id, str(statistic) + ' num of tickets - '+ str(len(tickets)), parse_mode='Markdown')
+def sendStatistic(statistic, sumt):
+    bot.send_message(id, f' Statistic is {str(statistic)}, num of tickets is {str(len(tickets))}, all income is {sumt}', parse_mode='Markdown')
 def sendLose(symbol):
     bot.send_message(id, f'We need to sell this coin {symbol}')
 def checkTrend(coinInfo):
-    if coinInfo['prices'][-1] > coinInfo['prices'][-15]:
+    if coinInfo['prices'][-1] > coinInfo['prices'][-25]:
         coinInfo['trend'] = True
     else:
         coinInfo['trend'] = False
@@ -70,13 +72,13 @@ def checkPrecision(coinInfo, precision):
         precision = int(precision)
     x = round(coinInfo['prices'][-1], precision)
     return x
-# def supportAndDefence(coinInfo):
-#     support = coinInfo['mins'][-1]
-#     defence = coinInfo['maxs'][-1]
-#     if coinInfo['prices'][-1] >= support:
-#         coinInfo['buySignal'][5] = True
-#     elif coinInfo['prices'][-1] <= defence:
-#         coinInfo['buySignal'][5] = False
+def supportAndDefence(coinInfo):
+    support = coinInfo['mins'][-1]
+    defence = coinInfo['maxs'][-1]
+    if coinInfo['prices'][-1] >= support:
+        coinInfo['buySignal'][5] = True
+    elif coinInfo['prices'][-1] <= defence:
+        coinInfo['buySignal'][5] = False
 
 
 def CCIs(coinInfo):
@@ -94,19 +96,20 @@ def CCIs(coinInfo):
                 coinInfo['buySignal'][4] = False
 
 def Fibo(coinInfo):
-    maximum = max(coinInfo['prices'][:-15:-1])
-    fibo = [0.786 * maximum, 0.618 * maximum, 0.382 * maximum, 0.236 * maximum]
-    percents = 0.02
-    lastPrice = coinInfo['prices'][-1]
-    if lastPrice < fibo[0] + fibo[0] * percents and lastPrice > fibo[0] - fibo[0] * percents:
-        coinInfo['buySignal'][3] = True
-    if lastPrice < fibo[1] + fibo[1] * percents and lastPrice > fibo[1] - fibo[1] * percents:
-        coinInfo['buySignal'][3] = True
-    if lastPrice < fibo[2] + fibo[2] * percents and lastPrice > fibo[2] - fibo[2] * percents:
-        coinInfo['buySignal'][3] = True
-    if lastPrice < fibo[3] + fibo[3] * percents and lastPrice > fibo[3] - fibo[3] * percents:
-        coinInfo['buySignal'][3] = True
-    
+    if len(coinInfo['prices']) > 46:
+        maximum = max(coinInfo['prices'][:-45:-1])
+        fibo = [0.786 * maximum, 0.618 * maximum, 0.382 * maximum, 0.236 * maximum]
+        percents = 0.02
+        lastPrice = coinInfo['prices'][-1]
+        if lastPrice < fibo[0] + fibo[0] * percents and lastPrice > fibo[0] - fibo[0] * percents:
+            coinInfo['buySignal'][3] = True
+        if lastPrice < fibo[1] + fibo[1] * percents and lastPrice > fibo[1] - fibo[1] * percents:
+            coinInfo['buySignal'][3] = True
+        if lastPrice < fibo[2] + fibo[2] * percents and lastPrice > fibo[2] - fibo[2] * percents:
+            coinInfo['buySignal'][3] = True
+        if lastPrice < fibo[3] + fibo[3] * percents and lastPrice > fibo[3] - fibo[3] * percents:
+            coinInfo['buySignal'][3] = True
+        
 def Stochastic(coinInfo):
     priceLock = coinInfo['prices'][-1]
     minimum = min(coinInfo['prices'][:15])
@@ -145,7 +148,7 @@ def Rsis(coinInfo):
         difference = abs(difference)
         coinInfo['avg_loss'] += difference
     
-    if counterRsi > 50:
+    if counterRsi > 75:
         coinInfo['avg_gain'] = 1
         coinInfo['avg_loss'] = 1
 
@@ -180,15 +183,16 @@ def buy(coinInfo, signals):
                 Ticket = {
                     'symbol' : coinInfo['symbol'],
                     'price' : coinInfo['prices'][-1],
-                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * 0.007,
-                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * 0.025,
+                    'takeprofit' : coinInfo['prices'][-1] + coinInfo['prices'][-1] * takeProfitPercents,
+                    'stoploss' : coinInfo['prices'][-1] - coinInfo['prices'][-1]  * stopLossPercents,
                     'qty' : qty,
                     'time' : now,
                     'sold' : False,
                     'income' : 0,
                     'status' : '',
                     'signals' : signals,
-                    'precision' : coinInfo['precision']
+                    'precision' : coinInfo['precision'],
+                    'lifeofticket' : 0
                 }
                 tickets.append(Ticket)
     except Exception as E:
@@ -198,14 +202,20 @@ def buy(coinInfo, signals):
 
 def sell(ticket):
     try:
-        order = client.order_market_sell(
-            symbol=ticket['symbol'],
-            quantity=ticket['qty']
-            )
-        print('Sold ', ticket['symbol'])
-        ticket['sold'] = True 
-        balance = float(client.get_asset_balance(asset='USDT')['free'])
-        balances.append(balance)
+        balance_coin = float(client.get_asset_balance(asset=f"{ticket['symbol'].replace('USDT', '')}")['free'])
+        balance_usdt = balance_coin * ticket['price']
+        if balance_usdt > 10:
+            order = client.order_market_sell(
+                symbol=ticket['symbol'],
+                quantity=ticket['qty']
+                )
+            print('Sold ', ticket['symbol'])
+            ticket['sold'] = True 
+            balance = float(client.get_asset_balance(asset='USDT')['free'])
+            balances.append(balance)
+        else:
+            sendLose(ticket['symbol'])
+            ticket['sold'] = True
     except Exception as E:
         balance_coin = float(client.get_asset_balance(asset=f"{ticket['symbol'].replace('USDT', '')}")['free'])
         balance_usdt = balance_coin * ticket['price']
@@ -239,6 +249,7 @@ def errorSell(ticket, quantity):
                     quantity=quantity
                 )
                 print('sold before error error')
+                break
             except:
                 counter += 1
                 if counter == 5:
@@ -313,7 +324,7 @@ def checkIndicators(coinInfo):
         Fibo(coinInfo)
         Stochastic(coinInfo)
         CCIs(coinInfo)
-        # supportAndDefence(coinInfo)
+        supportAndDefence(coinInfo)
         checkTrend(coinInfo)
         checkVolatility(coinInfo)
         
@@ -329,13 +340,17 @@ def checkIndicators(coinInfo):
 def makeStatistic(tickets):
     counterLoss = 1
     counterGain = 1
+    sumt = 0
     for i in tickets:
         if i['status'] == 'loss':
             counterLoss += 1
         elif i['status'] == 'gain':
             counterGain += 1
     statistic = counterGain / counterLoss * 100
-    sendStatistic(statistic)
+    for ticket in tickets:
+        if ticket['sold'] == True:
+            sumt += ticket['income']
+    sendStatistic(statistic, sumt)
     print('Statistic - ', statistic)
     
 for coin in whitelist:
@@ -343,11 +358,15 @@ for coin in whitelist:
 def checkTicketsToSell(tickets, price, symbol):
     for ticket in tickets:
         if ticket['symbol'] == symbol and ticket['sold'] == False:
-            # print('We waiting ', ticket['takeprofit'], 'or', ticket['stoploss'], 'pricenow', price)
-            if price > ticket['takeprofit']     :
+            ticket['lifeofticet'] += 1
+            if ticket['lifeofticket'] == 50:
+                ticket['takeprofit'] =  ticket['takeprofit'] - ticket['takeprofit'] * 0.0045
+            if price > ticket['takeprofit']:
+                ticket['income'] = ticket['qty'] * ticket['takeprofit'] - ticket['qty'] * ticket['price']
                 sell(ticket)
                 ticket['status'] = 'gain'
             elif price < ticket['stoploss']:
+                ticket['income'] = ticket['qty'] * ticket['price'] - ticket['qty'] * ticket['stoploss'] 
                 sell(ticket)
                 ticket['status'] = 'loss'
 startTelebot()
