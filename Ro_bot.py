@@ -99,7 +99,7 @@ def Fibo(coinInfo):
     if len(coinInfo['prices']) > 46:
         maximum = max(coinInfo['prices'][:-45:-1])
         fibo = [0.786 * maximum, 0.618 * maximum, 0.382 * maximum, 0.236 * maximum]
-        percents = 0.02
+        percents = 0.05
         lastPrice = coinInfo['prices'][-1]
         if lastPrice < fibo[0] + fibo[0] * percents and lastPrice > fibo[0] - fibo[0] * percents:
             coinInfo['buySignal'][3] = True
@@ -318,15 +318,17 @@ def checkIndicators(coinInfo):
     try:
         global signalCounter
         signalCounter = 0
-        print('RSI')
+        print('1')
         Rsis(coinInfo)
+        print('1')
         Mcds(coinInfo)
+        print('1')
         Fibo(coinInfo)
+        print('1')
         Stochastic(coinInfo)
+        print('1')
         CCIs(coinInfo)
-        print('Supp')
         supportAndDefence(coinInfo)
-        print('Vola and trend')
         checkTrend(coinInfo)
         checkVolatility(coinInfo)
         
@@ -384,7 +386,7 @@ for i in range(2880):
             if len(coinInfo['prices']) > 15:
                 checkIndicators(coinInfo)
                 checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'])
-        time.sleep(30)
+        time.sleep(1)
     except Exception as E:
         print(E)
         client = Client(api_key, api_secret)
