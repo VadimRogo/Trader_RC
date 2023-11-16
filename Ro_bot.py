@@ -381,7 +381,7 @@ for i in range(2880):
             if len(coinInfo['prices']) > 15:
                 checkIndicators(coinInfo)
                 checkTicketsToSell(tickets, coinInfo['prices'][-1], coinInfo['symbol'])
-        time.sleep(1)
+        time.sleep(30)
     except Exception as E:
         print(E)
         client = Client(api_key, api_secret)
