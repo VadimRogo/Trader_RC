@@ -41,7 +41,7 @@ def sendStatistic(statistic, sumt):
 def sendLose(symbol):
     bot.send_message(id, f'We need to sell this coin {symbol}')
 def checkTrend(coinInfo):
-    if coinInfo['prices'][-1] > coinInfo['prices'][-25]:
+    if coinInfo['prices'][-1] > coinInfo['prices'][-15]:
         coinInfo['trend'] = True
     else:
         coinInfo['trend'] = False
@@ -323,11 +323,8 @@ def checkIndicators(coinInfo):
         Fibo(coinInfo)
         Stochastic(coinInfo)
         CCIs(coinInfo)
-        print('1')
         supportAndDefence(coinInfo)
-        print('1')
         checkTrend(coinInfo)
-        print('1')
         checkVolatility(coinInfo)
         
         for i in coinInfo['buySignal']:
