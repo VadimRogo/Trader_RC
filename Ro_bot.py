@@ -357,7 +357,7 @@ for coin in whitelist:
 def checkTicketsToSell(tickets, price, symbol):
     for ticket in tickets:
         if ticket['symbol'] == symbol and ticket['sold'] == False:
-            ticket['lifeofticet'] += 1
+            ticket['lifeofticket'] += 1
             if ticket['lifeofticket'] == 50:
                 ticket['takeprofit'] =  ticket['takeprofit'] - ticket['takeprofit'] * 0.0045
             if price > ticket['takeprofit']:
