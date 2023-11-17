@@ -15,7 +15,7 @@ client = Client(api_key, api_secret)
 
 whitelist = ['SOLUSDT', 'ADAUSDT', 'DOGEUSDT', 'TRXUSDT', 'LINKUSDT', 'MATICUSDT', 'DOTUSDT', 'AVAXUSDT', 'LTCUSDT', 'DAIUSDT', 'SHIBUSDT', 'ATOMUSDT', 'XLMUSDT', 'UNIUSDT', 'FILUSDT', 'XMRUSDT', 'LDOUSDT', 'RUNEUSDT', 'QNTUSDT']
 info = client.futures_exchange_info()
-precision = 1
+precision = 0
 def get_precision(symbol):
    for x in info['symbols']:
     if x['symbol'] == symbol:
