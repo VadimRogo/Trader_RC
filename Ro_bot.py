@@ -36,14 +36,29 @@ def startTelebot():
     bot.send_message(id, "We start a work, let's see what statistic will be", parse_mode='Markdown')
     
 
-def sendStatistic(statistic, sumt):
-    bot.send_message(id, f' Statistic is {str(statistic)}, num of tickets is {str(len(tickets))}, all income is {sumt}', parse_mode='Markdown')
+def sendStatistic(statistic, sumt, cycle):
+    bot.send_message(id, f' Statistic is {str(statistic)}, num of tickets is {str(len(tickets))}, all income is {sumt}, cycle num {cycle}', parse_mode='Markdown')
 def sendLose(symbol):
     bot.send_message(id, f'We need to sell this coin {symbol}')
-def checkTrend(coinInfo):
-    if coinInfo['prices'][-1] > coinInfo['prices'][-15]:
-        coinInfo['trend'] = True
+def carefulMode(Mode):
+    global takeProfitPercents, stopLossPercents
+    if Mode == True:
+        takeProfitPercents = 0.0045
+        stopLossPercents = 0.010
     else:
+        takeProfitPercents = 0.007
+        stopLossPercents = 0.025
+def checkTrend(coinInfo):
+    if coinInfo['prices'][-1] > coinInfo['prices'][-100]:
+        coinInfo['trend'] = True
+        coinInfo['carefulmode'] = False
+        carefulMode(False)
+    elif coinInfo['prices'][-1]  > coinInfo['prices'][-15]:
+        coinInfo['carefulmode'] = True
+        coinInfo['trend'] = True
+        carefulMode(True)
+    else:
+        coinInfo['carefulmode'] = False
         coinInfo['trend'] = False
 
 def checkVolatility(coinInfo):
@@ -191,8 +206,10 @@ def buy(coinInfo, signals):
                     'status' : '',
                     'signals' : signals,
                     'precision' : coinInfo['precision'],
+                    'carefulmode' : coinInfo['carefulmode'],
                     'lifeofticket' : 0
                 }
+
                 tickets.append(Ticket)
     except Exception as E:
         print(E)
@@ -324,7 +341,8 @@ def checkIndicators(coinInfo):
         Stochastic(coinInfo)
         CCIs(coinInfo)
         supportAndDefence(coinInfo)
-        checkTrend(coinInfo)
+        if len(coinInfo['prices']) >= 100: 
+            checkTrend(coinInfo)
         checkVolatility(coinInfo)
         
         for i in coinInfo['buySignal']:
@@ -336,7 +354,7 @@ def checkIndicators(coinInfo):
                 coinInfo['buySignal'] = [False, False, False, False, False, False]            
     except Exception as E:
         print(E)
-def makeStatistic(tickets):
+def makeStatistic(tickets, cycle):
     counterLoss = 1
     counterGain = 1
     sumt = 0
@@ -345,11 +363,11 @@ def makeStatistic(tickets):
             counterLoss += 1
         elif i['status'] == 'gain':
             counterGain += 1
-    statistic = counterGain / counterLoss * 100
+    statistic = counterGain / counterLoss
     for ticket in tickets:
         if ticket['sold'] == True:
             sumt += ticket['income']
-    sendStatistic(statistic, sumt)
+    sendStatistic(statistic, sumt, cycle)
     print('Statistic - ', statistic)
     
 for coin in whitelist:
@@ -365,7 +383,7 @@ def checkTicketsToSell(tickets, price, symbol):
                 sell(ticket)
                 ticket['status'] = 'gain'
             elif price < ticket['stoploss']:
-                ticket['income'] = ticket['qty'] * ticket['price'] - ticket['qty'] * ticket['stoploss'] 
+                ticket['income'] = ticket['qty'] * ticket['stoploss'] - ticket['qty'] * ticket['price']
                 sell(ticket)
                 ticket['status'] = 'loss'
 startTelebot()
@@ -374,7 +392,7 @@ for i in range(2880):
         if i % 10 == 0:
             print('cycle ', i)
         if i % 100 == 0:
-            makeStatistic(tickets)
+            makeStatistic(tickets. cycle)
         for coinInfo in coinInfos:
             appendPrices(coinInfo)
             balance = float(client.get_asset_balance(asset='USDT')['free'])
