@@ -408,4 +408,3 @@ for i in range(2880):
 for ticket in tickets:
     sell(ticket)
 bot.polling(none_stop=True, interval=0)
-makeStatistic(tickets)
