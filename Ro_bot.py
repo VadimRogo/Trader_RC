@@ -392,7 +392,7 @@ for i in range(2880):
         if i % 10 == 0:
             print('cycle ', i)
         if i % 100 == 0:
-            makeStatistic(tickets. i)
+            makeStatistic(tickets, i)
         for coinInfo in coinInfos:
             appendPrices(coinInfo)
             balance = float(client.get_asset_balance(asset='USDT')['free'])
