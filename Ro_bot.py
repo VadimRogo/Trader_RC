@@ -43,7 +43,7 @@ def sendLose(symbol):
 def carefulMode(Mode):
     global takeProfitPercents, stopLossPercents
     if Mode == True:
-        takeProfitPercents = 0.0045
+        takeProfitPercents = 0.007
         stopLossPercents = 0.010
     else:
         takeProfitPercents = 0.007
