@@ -43,11 +43,11 @@ def sendLose(symbol):
 def carefulMode(Mode):
     global takeProfitPercents, stopLossPercents
     if Mode == True:
-        takeProfitPercents = 0.007
-        stopLossPercents = 0.010
-    else:
-        takeProfitPercents = 0.007
+        takeProfitPercents = 0.009
         stopLossPercents = 0.025
+    else:
+        takeProfitPercents = 0.017
+        stopLossPercents = 0.045
 def checkTrend(coinInfo):
     if coinInfo['prices'][-1] > coinInfo['prices'][-100]:
         coinInfo['trend'] = True
@@ -67,7 +67,7 @@ def checkVolatility(coinInfo):
     for i in coinInfo['prices'][:-15:-1]:
         deviations.append(abs(EMA - i))
     standartDeviations = sum(deviations) / len(deviations)
-    if standartDeviations >= coinInfo['prices'][-1] * 0.002:
+    if standartDeviations >= coinInfo['prices'][-1] * 0.022:
         coinInfo['volatility'] = True
     else:
         coinInfo['volatility'] = False
@@ -170,9 +170,9 @@ def Rsis(coinInfo):
         RS = coinInfo['avg_gain'] / coinInfo['avg_loss']
         RSI = 100 - (100 / (1 + RS))
         coinInfo['rsis'].append(RSI)
-        if RSI < 30 and RSI > 20:
+        if RSI < 40 and RSI > 20:
             coinInfo['buySignal'][0] = True
-        elif RSI > 70 and RSI < 90:
+        elif RSI > 60 and RSI < 90:
             coinInfo['buySignal'][0] = False
     
 
@@ -339,7 +339,7 @@ def checkIndicators(coinInfo):
         Mcds(coinInfo)
         Fibo(coinInfo)
         Stochastic(coinInfo)
-        CCIs(coinInfo)
+        # CCIs(coinInfo)
         # supportAndDefence(coinInfo)
         if len(coinInfo['prices']) >= 100: 
             checkTrend(coinInfo)
