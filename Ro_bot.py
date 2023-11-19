@@ -339,7 +339,7 @@ def checkIndicators(coinInfo):
         Mcds(coinInfo)
         Fibo(coinInfo)
         Stochastic(coinInfo)
-        # CCIs(coinInfo)
+        CCIs(coinInfo)
         # supportAndDefence(coinInfo)
         if len(coinInfo['prices']) >= 100: 
             checkTrend(coinInfo)
